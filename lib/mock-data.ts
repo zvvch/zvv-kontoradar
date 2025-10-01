@@ -183,6 +183,9 @@ const generateHistoricalData = () => {
       lastBooking = new Date(2024, endMonth, endDay)
     }
     
+    // Generiere 8-30 Buchungen pro OK für spannendere Burn-Down Charts
+    const bookingCount = Math.floor(Math.random() * 22) + 8
+    
     const ok: OKOverview = {
       ok_id: okId.toString(),
       ok_nr: okNr,
@@ -190,7 +193,7 @@ const generateHistoricalData = () => {
       budget_total: budgetTotal,
       spent: -spent,
       available: available,
-      booking_count: Math.floor(Math.random() * 20) + 5,
+      booking_count: bookingCount,
       first_booking: firstBooking.toISOString().split('T')[0],
       last_booking: lastBooking.toISOString().split('T')[0],
       account_id: account.id,
@@ -200,15 +203,71 @@ const generateHistoricalData = () => {
     
     oks.push(ok)
     
-    // Generiere 5-20 Buchungen pro OK
-    const bookingCount = Math.floor(Math.random() * 15) + 5
+    // Zeitspanne für Buchungsverteilung
+    const timeSpan = lastBooking.getTime() - firstBooking.getTime()
+    
+    // Realistische Lieferanten
+    const vendors = [
+      'KANTON ZÜRICH', 'ABRAXAS AG', 'IBM SCHWEIZ AG', 'MICROSOFT SCHWEIZ GMBH', 
+      'SAP SCHWEIZ AG', 'SWISSCOM AG', 'SIEMENS SCHWEIZ AG', 'ABB SCHWEIZ AG',
+      'HUAWEI TECHNOLOGIES', 'CISCO SYSTEMS', 'ACCENTURE AG', 'DELOITTE AG',
+      'PWC SCHWEIZ', 'KPMG AG', 'EY SCHWEIZ', 'BDO AG', 'STADLER RAIL AG',
+      'BOMBARDIER TRANSPORTATION', 'ALSTOM SCHWEIZ AG', 'CAF SCHWEIZ',
+      'GOOGLE SCHWEIZ GMBH', 'AMAZON WEB SERVICES', 'SALESFORCE.COM',
+      'ORACLE SCHWEIZ GMBH', 'ADOBE SYSTEMS', 'AUTODESK SCHWEIZ'
+    ]
+    
+    const phases = ['Konzeptphase', 'Design', 'Entwicklung', 'Testing', 'Deployment', 
+                    'Wartung', 'Support', 'Schulung', 'Beratung', 'Infrastruktur',
+                    'Hardware', 'Software', 'Lizenzen', 'Services', 'Integration']
+    
+    // Verteile den spent-Betrag realistisch über die Buchungen
+    let remainingSpent = Math.abs(spent)
+    const bookingAmounts: number[] = []
+    
     for (let j = 0; j < bookingCount; j++) {
-      // Realistischere Buchungsdaten über den Zeitraum
-      const timeSpan = lastBooking.getTime() - firstBooking.getTime()
-      const randomTime = firstBooking.getTime() + (Math.random() * timeSpan)
-      const bookingDate = new Date(randomTime)
+      let amount: number
       
-      const amount = Math.floor(Math.random() * 50000) + 1000
+      if (j === bookingCount - 1) {
+        // Letzte Buchung: Rest-Betrag
+        amount = Math.max(100, remainingSpent)
+      } else {
+        // Variiere Buchungsgrößen realistisch
+        const sizeRoll = Math.random()
+        if (sizeRoll < 0.3) {
+          // 30%: Kleine Buchungen (5-15% des Durchschnitts)
+          amount = Math.floor((remainingSpent / (bookingCount - j)) * (0.05 + Math.random() * 0.1))
+        } else if (sizeRoll < 0.6) {
+          // 30%: Mittlere Buchungen (50-150% des Durchschnitts)
+          amount = Math.floor((remainingSpent / (bookingCount - j)) * (0.5 + Math.random()))
+        } else {
+          // 40%: Große Buchungen (100-300% des Durchschnitts)
+          amount = Math.floor((remainingSpent / (bookingCount - j)) * (1 + Math.random() * 2))
+        }
+        
+        // Mindestens 100 CHF, maximal der Rest
+        amount = Math.min(Math.max(100, amount), remainingSpent - (bookingCount - j - 1) * 100)
+      }
+      
+      bookingAmounts.push(amount)
+      remainingSpent -= amount
+    }
+    
+    // Erstelle Buchungen chronologisch sortiert
+    const sortedBookingDates = []
+    for (let j = 0; j < bookingCount; j++) {
+      // Exponentieller Verlauf: mehr Buchungen am Anfang, weniger am Ende
+      const progress = Math.pow(j / bookingCount, 0.7) // Exponent < 1 für mehr Aktivität am Anfang
+      const randomTime = firstBooking.getTime() + (progress * timeSpan) + (Math.random() * timeSpan * 0.05)
+      sortedBookingDates.push(new Date(randomTime))
+    }
+    sortedBookingDates.sort((a, b) => a.getTime() - b.getTime())
+    
+    for (let j = 0; j < bookingCount; j++) {
+      const bookingDate = sortedBookingDates[j]
+      const amount = bookingAmounts[j]
+      const vendor = vendors[Math.floor(Math.random() * vendors.length)]
+      const phase = phases[Math.floor(Math.random() * phases.length)]
       
       const booking: Booking = {
         id: bookingId,
@@ -217,7 +276,7 @@ const generateHistoricalData = () => {
         import_batch_id: null,
         booking_date: bookingDate.toISOString().split('T')[0],
         beleg_nr: `ZVV${String(130000 + bookingId).padStart(6, '0')}`,
-        text_long: `${Math.floor(Math.random() * 3000) + 2000} KANTON ZUERICH, ${name} - ${['Phase 1', 'Phase 2', 'Wartung', 'Service', 'Reparatur', 'Modernisierung', 'Installation', 'Konfiguration', 'Beratung', 'Schulung', 'Support', 'Wartung', 'Update', 'Migration', 'Test'][j % 15]}`,
+        text_long: `${Math.floor(Math.random() * 3000) + 2000} ${vendor}, ${name} - ${phase}`,
         gegenkonto: '2005500100 K',
         amount: -amount,
         currency: 'CHF',
