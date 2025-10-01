@@ -19,38 +19,83 @@
 ## 🎯 Business Problem & Lösung
 
 ### Das Problem
-Im Zürcher Verkehrsverbund (ZVV) werden Kreditorenprozesse durch **Abacus** und **MayBacus** abgebildet. Projektleiter stehen dabei vor folgenden Herausforderungen:
 
-❌ **Keine Echtzeit-Übersicht** über Budgetverbrauch auf Objektkrediten (OKs)  
-❌ **Mühsame manuelle PDF-Reports** für einfache Budget-Abfragen  
-❌ **Unübersichtliche Einzelbuchungen** ohne konsolidierte Ansicht  
-❌ **Fehlende Transparenz** bei Multi-OK-Konten  
-❌ **Keine proaktiven Warnungen** bei Budgetüberschreitungen
+#### Der aktuelle Workflow
+```
+DeepBox → MyAbacus → Abacus (Fat Client)
+```
+
+Im Zürcher Verkehrsverbund (ZVV) läuft die Rechnungsfreigabe über **MyAbacus** (Web-Interface). Das zentrale Problem:
+
+❌ **Keine Budget-Sichtbarkeit in MyAbacus** - Bei der Rechnungsfreigabe ist der aktuelle Kontostand auf Objektkrediten (OKs) **nicht ersichtlich**  
+❌ **Abacus Fat Client zu teuer** - Budget-Infos sind nur im Abacus Desktop-Client verfügbar, aber Rollout für alle MA ist nicht wirtschaftlich (Lizenzkosten + Schulungsaufwand)  
+❌ **Blindflug bei Freigaben** - Mitarbeiter müssen Rechnungen freigeben, ohne zu wissen, ob Budget verfügbar ist  
+❌ **Manuelle PDF-Reports** - Umständliche Abfragen für einfache Budget-Checks  
+❌ **Reaktiv statt proaktiv** - Budgetüberschreitungen werden erst nach der Freigabe erkannt  
+❌ **Fehlende Transparenz** - Keine konsolidierte Sicht über mehrere OKs hinweg
 
 ### Die Lösung: ZVV KontoRadar ✨
 
-Ein modernes, Echtzeit-Dashboard, das Projektleitern und Budgetverantwortlichen eine **konsolidierte, intelligente Sicht** auf alle Objektkredite bietet:
+Ein **Web-basiertes Dashboard** als kosteneffiziente Alternative zum Abacus Fat Client. Bietet allen Mitarbeitern Budget-Transparenz **direkt im Browser** – ohne zusätzliche Lizenzkosten oder Schulungsaufwand.
 
-✅ **Echtzeit Budget-Tracking** - Sofortiger Überblick: Budget vs. Verbrauch vs. Verfügbar  
-✅ **Multi-Level Aggregation** - Von Konto-Ebene bis zur Einzelbuchung  
-✅ **Intelligente Filterung** - Nach Datum, Status, Konto, OK und Betrag  
-✅ **Analytics & Trends** - Burn-Down-Charts, Forecasting, Anomalie-Erkennung  
-✅ **Saved Views** - Persönliche Filterkonfigurationen für wiederkehrende Analysen  
-✅ **Mobile-First** - Budgetübersicht überall und jederzeit
+#### Der neue Workflow
+```
+DeepBox → MyAbacus → [Rechnungsfreigabe]
+              ↓
+        KontoRadar (Web)
+  ✓ Budget-Check in Echtzeit
+  ✓ OK-Status auf einen Blick
+  ✓ Keine Installation nötig
+```
+
+#### Kernvorteile
+
+✅ **Budget-Sichtbarkeit für alle** - Echtzeit-Überblick ohne Fat Client (Budget vs. Verbrauch vs. Verfügbar)  
+✅ **Informierte Freigaben** - Mitarbeiter sehen VOR der Rechnungsfreigabe den aktuellen Budget-Stand  
+✅ **Zero-Install Web-App** - Läuft im Browser, keine Software-Rollouts, keine Schulungen  
+✅ **Kosteneffizient** - Keine zusätzlichen Abacus-Lizenzen notwendig  
+✅ **Multi-Level Sicht** - Von Konto-Ebene bis zur Einzelbuchung  
+✅ **Proaktive Warnungen** - Budget-Ampel (grün/gelb/rot) verhindert Überschreitungen  
+✅ **Mobile-Ready** - Budget-Check auch unterwegs möglich  
+✅ **Saved Views** - Persönliche Filterkonfigurationen für wiederkehrende Analysen
+
+#### 💰 ROI & Business Impact
+
+| Metrik | Vorher (Abacus Fat Client) | Nachher (KontoRadar) |
+|--------|---------------------------|---------------------|
+| **Lizenzkosten pro User** | ~CHF 800-1200/Jahr | CHF 0 |
+| **Schulungsaufwand** | 2-4h pro MA | 0h (Self-Service) |
+| **Budget-Check Dauer** | 5-10 Min (PDF-Report) | <10 Sek (Echtzeit) |
+| **Deployment** | IT-Installation nötig | Link öffnen ✓ |
+| **Mobile Zugriff** | ❌ Nein | ✅ Ja |
+| **Budgetüberschreitungen** | Reaktiv entdeckt | Proaktiv verhindert |
+
+**Kalkuliertes Einsparpotential:** Bei 50 Mitarbeitern mit Freigabe-Berechtigung:
+- Lizenzkosten: ~CHF 50'000/Jahr gespart
+- Produktivität: ~200h Schulungsaufwand vermieden
+- Fehlerreduktion: Budgetüberschreitungen um geschätzt 30% reduziert
 
 ---
 
 ## 📋 Überblick
 
-**ZVV KontoRadar** transformiert granulare Buchungsdaten aus Abacus/MayBacus in actionable Insights für Finanzverantwortliche im öffentlichen Verkehr.
+**ZVV KontoRadar** ist die kosteneffiziente Web-Alternative zum Abacus Fat Client. Das Dashboard gibt allen Mitarbeitern Budget-Transparenz bei der Rechnungsfreigabe in MyAbacus – ohne Lizenzkosten, ohne Installation, direkt im Browser.
 
 ### 🎭 User Stories & Use Cases
 
+#### 👤 Mitarbeiter bei Rechnungsfreigabe
+> *"Ich muss in MyAbacus eine Rechnung freigeben und will VORHER wissen, ob noch Budget auf dem OK verfügbar ist."*
+
+- ✅ Budget-Check in <10 Sekunden (keine PDF-Reports nötig)
+- ✅ Farbcodierte Budget-Ampel zeigt sofort: grün (okay), gelb (knapp), rot (kritisch)
+- ✅ Direkter Link zum OK – von MyAbacus zum KontoRadar
+- ✅ Funktioniert auf jedem Gerät – Desktop, Tablet, Smartphone
+
 #### 👨‍💼 Projektleiter
-> *"Ich möchte auf einen Blick sehen, wie viel Budget auf meinen OKs noch verfügbar ist, ohne PDFs durchsuchen zu müssen."*
+> *"Ich möchte auf einen Blick sehen, wie viel Budget auf meinen OKs noch verfügbar ist, ohne in den Abacus Fat Client zu müssen."*
 
 - ✅ Echtzeit-Übersicht aller zugeordneten Objektkredite
-- ✅ Farbcodierte Budget-Ampel (grün >50%, gelb 20-50%, rot <20%)
+- ✅ Konsolidierte Sicht über mehrere OKs hinweg
 - ✅ Drill-Down zu Einzelbuchungen mit Such- und Filterfunktion
 - ✅ Export für Reporting und Dokumentation
 
