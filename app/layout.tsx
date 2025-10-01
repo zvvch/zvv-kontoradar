@@ -34,9 +34,9 @@ export default function RootLayout({
     <html lang="de">
       <body className={inter.className}>
         <ThemeProvider>
-          <div className="h-screen flex flex-col bg-gradient-to-br from-gray-50 via-primary-50/30 to-gray-100 dark:from-[#0056b3]/20 dark:via-[#0479cc]/10 dark:to-[#0056b3]/20">
+          <div className="h-screen flex flex-col bg-gradient-to-br from-gray-50 via-primary-50/30 to-gray-100 dark:bg-gray-900">
             {/* Kompakter Header - Full Width */}
-            <header className="flex-shrink-0 bg-gradient-to-r from-white/95 via-[#0479cc]/5 to-white/95 dark:bg-[#0056b3] backdrop-blur-sm border-b border-gray-200 dark:border-[#0479cc]/30 shadow-sm">
+            <header className="flex-shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
               <div className="w-full px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-3">
                   <div className="flex items-center space-x-4">
