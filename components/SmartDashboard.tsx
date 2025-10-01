@@ -96,6 +96,13 @@ export function SmartDashboard() {
     applyUrlFilters()
   }, [searchParams])
 
+  // Schließe Burn-Down Chart automatisch wenn Bedingung nicht mehr erfüllt
+  useEffect(() => {
+    if (!canShowBurnDown && showBurnDown) {
+      setShowBurnDown(false)
+    }
+  }, [canShowBurnDown, showBurnDown])
+
   // Excel-like Column + Row Hover Effect
   useEffect(() => {
     const table = document.getElementById('data-table')
@@ -454,6 +461,15 @@ export function SmartDashboard() {
            filters.dateRange.end
   }, [filters])
 
+  // Prüfe ob Burn-Down Chart angezeigt werden kann (nur bei genau 1 OK)
+  const canShowBurnDown = useMemo(() => {
+    const hasExactlyOneOK = filters.columnFilters.ok_nr.length === 1
+    const hasAccountFilter = filters.columnFilters.konto_nr.length > 0
+    
+    // Zeige nur wenn genau 1 OK ausgewählt und kein Konto-Filter aktiv
+    return hasExactlyOneOK && !hasAccountFilter
+  }, [filters.columnFilters.ok_nr, filters.columnFilters.konto_nr])
+
   // Generiere Burn-Down Daten für gefilterte OKs
   const burnDownData = useMemo(() => {
     if (!hasActiveFilters || filteredData.length === 0) return []
@@ -710,8 +726,8 @@ export function SmartDashboard() {
           )}
           </div>
 
-          {/* Burn-Down Chart Button - nur sichtbar wenn Filter aktiv sind */}
-          {hasActiveFilters && (
+          {/* Burn-Down Chart Button - nur sichtbar wenn genau 1 OK gefiltert ist */}
+          {canShowBurnDown && (
             <button
               onClick={() => setShowBurnDown(!showBurnDown)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -728,8 +744,8 @@ export function SmartDashboard() {
             </div>
           </div>
 
-      {/* Burn-Down Chart - Zeige wenn Button aktiviert ist */}
-      {showBurnDown && burnDownData.length > 0 && (
+      {/* Burn-Down Chart - Zeige nur wenn Button aktiviert UND genau 1 OK gefiltert ist */}
+      {showBurnDown && canShowBurnDown && burnDownData.length > 0 && (
         <div className="px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="space-y-4">
             {burnDownData.map(({ ok, data }) => {
