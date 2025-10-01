@@ -256,25 +256,7 @@ const generateHistoricalData = () => {
 const { oks, bookings, accounts } = generateHistoricalData()
 
 export const mockOKOverviews: OKOverview[] = oks
-
-// Generiere Account-Übersichten basierend auf den generierten Daten
-export const mockAccountOverviews: AccountOverview[] = accounts.map(account => {
-  const accountOKs = oks.filter(ok => ok.account_id === account.id)
-  const totalBudget = accountOKs.reduce((sum, ok) => sum + ok.budget_total, 0)
-  const totalSpent = accountOKs.reduce((sum, ok) => sum + ok.spent, 0)
-  const totalAvailable = accountOKs.reduce((sum, ok) => sum + ok.available, 0)
-  
-  return {
-    account_id: account.id,
-    konto_nr: account.nr,
-    account_name: account.name,
-    ok_count: accountOKs.length,
-    total_budget: totalBudget,
-    total_spent: totalSpent,
-    total_available: totalAvailable
-  }
-})
-
+export const mockAccountOverviews: AccountOverview[] = accounts
 export const mockBookings: Booking[] = bookings
 
 // Mock-Supabase Client für lokale Entwicklung
