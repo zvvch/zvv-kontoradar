@@ -1,0 +1,264 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: var(--font-inter), var(--font-roboto), system-ui, sans-serif;
+  }
+  
+  body {
+    @apply transition-colors duration-300 font-zvv;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ZVV-ähnliche Typographie */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-medium;
+    letter-spacing: -0.025em;
+  }
+
+  h1 {
+    @apply text-3xl lg:text-4xl;
+    line-height: 1.1;
+  }
+
+  h2 {
+    @apply text-2xl lg:text-3xl;
+    line-height: 1.2;
+  }
+
+  h3 {
+    @apply text-xl lg:text-2xl;
+    line-height: 1.3;
+  }
+
+  h4 {
+    @apply text-lg lg:text-xl;
+    line-height: 1.4;
+  }
+
+  p {
+    @apply leading-relaxed;
+  }
+
+  /* ZVV-spezifische Text-Styles */
+  .text-zvv-brown {
+    @apply text-zvv-brown-700 dark:text-zvv-brown-300;
+  }
+
+  .text-zvv-blue {
+    @apply text-zvv-blue-700 dark:text-zvv-blue-300;
+  }
+
+  .text-zvv-green {
+    @apply text-zvv-green-700 dark:text-zvv-green-300;
+  }
+  
+  /* Light mode background */
+  .light {
+    @apply bg-gray-50;
+  }
+  
+  /* Dark mode background */
+  .dark {
+    @apply bg-gray-900;
+  }
+}
+
+@layer components {
+  /* Subtle glass cards */
+  .glass-card {
+    @apply relative overflow-hidden rounded-xl border border-white/10 backdrop-blur-sm;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+  }
+  
+  .glass-card-dark {
+    @apply relative overflow-hidden rounded-2xl border border-white/10 backdrop-blur-xl;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+  
+  .glass-card-light {
+    @apply relative overflow-hidden rounded-2xl border border-white/30 backdrop-blur-xl;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+  }
+  
+  /* Clean buttons */
+  .glass-btn-primary {
+    @apply relative rounded-lg border border-primary-500 bg-primary-600 px-6 py-3 font-medium transition-all duration-200 hover:shadow-md hover:bg-primary-700;
+  }
+  
+  .glass-btn-secondary {
+    @apply relative overflow-hidden rounded-xl border border-white/20 backdrop-blur-sm px-6 py-3 font-medium transition-all duration-300 hover:scale-105;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Glass Table */
+  .glass-table {
+    @apply w-full backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+  }
+  
+  .glass-table-header {
+    @apply px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  }
+  
+  .glass-table-cell {
+    @apply px-6 py-4 whitespace-nowrap text-sm border-b border-white/10;
+  }
+  
+  /* Glass Status Badges */
+  .glass-badge {
+    @apply inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm border border-white/20;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  }
+  
+  .glass-badge-success {
+    @apply glass-badge;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.8), rgba(22, 163, 74, 0.9));
+    box-shadow: 0 4px 16px 0 rgba(34, 197, 94, 0.3);
+  }
+  
+  .glass-badge-warning {
+    @apply glass-badge;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.9));
+    box-shadow: 0 4px 16px 0 rgba(245, 158, 11, 0.3);
+  }
+  
+  .glass-badge-danger {
+    @apply glass-badge;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.9));
+    box-shadow: 0 4px 16px 0 rgba(239, 68, 68, 0.3);
+  }
+  
+  /* Glass Input */
+  .glass-input {
+    @apply w-full rounded-xl border border-white/20 backdrop-blur-sm px-4 py-3 transition-all duration-300 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Glass Navigation */
+  .glass-nav {
+    @apply backdrop-blur-xl border-b border-white/20;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+  }
+  
+  /* Remove shimmer effect - too distracting */
+  
+  /* Subtle hover effects */
+  .float {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .float:hover {
+    transform: translateY(-2px);
+  }
+  
+  .pulse-glow {
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  .pulse-glow:hover {
+    box-shadow: 0 0 20px rgba(4, 121, 204, 0.4);
+  }
+}
+
+@layer utilities {
+  /* Custom Scrollbar Styles */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+    border-radius: 10px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 dark:bg-gray-600;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500 dark:bg-gray-500;
+  }
+
+  /* Firefox */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175) rgb(243 244 246);
+  }
+
+  .dark .scrollbar-thin {
+    scrollbar-color: rgb(75 85 99) rgb(31 41 55);
+  }
+
+  /* Excel-like Column + Row Hover Effect - ZVV Farben */
+  table {
+    position: relative;
+  }
+
+  table thead th {
+    position: relative;
+  }
+
+  /* Spalten-Hover - ZVV Hellblau #0479cc */
+  table td.column-hover,
+  table th.column-hover {
+    background-color: rgba(4, 121, 204, 0.12) !important;
+    transition: background-color 0.15s ease;
+  }
+
+  .dark table td.column-hover,
+  .dark table th.column-hover {
+    background-color: rgba(4, 121, 204, 0.25) !important;
+  }
+
+  /* Zeilen-Hover - ZVV Hellblau #0479cc */
+  table td.row-hover {
+    background-color: rgba(4, 121, 204, 0.12) !important;
+    transition: background-color 0.15s ease;
+  }
+
+  .dark table td.row-hover {
+    background-color: rgba(4, 121, 204, 0.25) !important;
+  }
+
+  /* Aktive Zelle - ZVV Dunkelblau #03558f (noch dunkler) */
+  table td.cell-active {
+    background-color: rgba(3, 85, 143, 0.35) !important;
+    transition: background-color 0.15s ease;
+  }
+
+  .dark table td.cell-active {
+    background-color: rgba(3, 85, 143, 0.50) !important;
+  }
+
+  /* Klickbare Zellen (Konto, OK) - nur beim direkten Cell-Hover dunkel */
+  table td.cursor-pointer.cell-active {
+    background-color: rgba(3, 85, 143, 0.90) !important;
+  }
+
+  .dark table td.cursor-pointer.cell-active {
+    background-color: rgba(3, 85, 143, 0.70) !important;
+  }
+
+  /* Text in klickbaren Zellen wird weiß nur bei cell-active */
+  table td.cursor-pointer.cell-active span {
+    color: white !important;
+  }
+}
