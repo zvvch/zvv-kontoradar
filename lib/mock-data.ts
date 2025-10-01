@@ -118,8 +118,8 @@ const generateHistoricalData = () => {
   let bookingId = 1
 
   // Generiere 50 OKs mit 2024 und 2025 Daten - übersichtliche Testdaten
-  // Verwende die ersten 25 Konten für realistische Verteilung
-  const activeAccounts = accounts.slice(0, 25)
+  // Verwende nur 8 Konten damit jedes Konto 6-7 OKs hat (besser sichtbar)
+  const activeAccounts = accounts.slice(0, 8)
   
   for (let i = 0; i < 50; i++) {
     const account = activeAccounts[i % activeAccounts.length]
@@ -293,6 +293,14 @@ const generateHistoricalData = () => {
     
     okId++
   }
+  
+  // Sortiere OKs nach Konto-Nummer für bessere Übersichtlichkeit
+  oks.sort((a, b) => {
+    if (a.konto_nr !== b.konto_nr) {
+      return a.konto_nr.localeCompare(b.konto_nr)
+    }
+    return a.ok_nr.localeCompare(b.ok_nr)
+  })
   
   // Generiere Account-Übersichten
   const accountOverviews: AccountOverview[] = accounts.map(account => {
