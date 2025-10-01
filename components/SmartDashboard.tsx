@@ -96,13 +96,6 @@ export function SmartDashboard() {
     applyUrlFilters()
   }, [searchParams])
 
-  // Schließe Burn-Down Chart automatisch wenn Bedingung nicht mehr erfüllt
-  useEffect(() => {
-    if (!canShowBurnDown && showBurnDown) {
-      setShowBurnDown(false)
-    }
-  }, [canShowBurnDown, showBurnDown])
-
   // Excel-like Column + Row Hover Effect
   useEffect(() => {
     const table = document.getElementById('data-table')
@@ -469,6 +462,13 @@ export function SmartDashboard() {
     // Zeige nur wenn genau 1 OK ausgewählt und kein Konto-Filter aktiv
     return hasExactlyOneOK && !hasAccountFilter
   }, [filters.columnFilters.ok_nr, filters.columnFilters.konto_nr])
+
+  // Schließe Burn-Down Chart automatisch wenn Bedingung nicht mehr erfüllt
+  useEffect(() => {
+    if (!canShowBurnDown && showBurnDown) {
+      setShowBurnDown(false)
+    }
+  }, [canShowBurnDown, showBurnDown])
 
   // Generiere Burn-Down Daten für gefilterte OKs
   const burnDownData = useMemo(() => {
