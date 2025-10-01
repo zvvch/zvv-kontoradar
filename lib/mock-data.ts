@@ -118,8 +118,11 @@ const generateHistoricalData = () => {
   let bookingId = 1
 
   // Generiere 500 OKs mit 2024 und 2025 Daten
+  // Verwende nur die ersten 12 Konten für bessere Sichtbarkeit
+  const activeAccounts = accounts.slice(0, 12)
+  
   for (let i = 0; i < 500; i++) {
-    const account = accounts[i % accounts.length]
+    const account = activeAccounts[i % activeAccounts.length]
     const template = okTemplates[i % okTemplates.length]
     const name = template.names[i % template.names.length]
     
