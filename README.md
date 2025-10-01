@@ -1,16 +1,74 @@
 # ZVV KontoRadar
 
-![Kontoradar Logo](https://img.shields.io/badge/ZVV Kontoradar--amber?style=for-the-badge&logo=react)
+<div align="center">
 
-Ein intelligentes Dashboard für die Verwaltung von Objektkrediten und Budgetverbrauch im Zürcher Verkehrsverbund (ZVV).
+![Next.js](https://img.shields.io/badge/Next.js-15.5-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=for-the-badge&logo=typescript)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green?style=for-the-badge&logo=supabase)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=for-the-badge&logo=tailwind-css)
+![License](https://img.shields.io/badge/License-ZVV%20Internal-amber?style=for-the-badge)
 
-## 🚀 Live Demo
+**Intelligente Budgetverwaltung für Objektkredite im öffentlichen Verkehr**
 
-**🌐 [kontoradar.zvv.dev](https://kontoradar.zvv.dev)**
+🌐 **[kontoradar.zvv.dev](https://kontoradar.zvv.dev)** | 📖 [Dokumentation](#) | 🐛 [Issues](https://github.com/zvvch/zvv-kontoradar/issues)
+
+</div>
+
+---
+
+## 🎯 Business Problem & Lösung
+
+### Das Problem
+Im Zürcher Verkehrsverbund (ZVV) werden Kreditorenprozesse durch **Abacus** und **MayBacus** abgebildet. Projektleiter stehen dabei vor folgenden Herausforderungen:
+
+❌ **Keine Echtzeit-Übersicht** über Budgetverbrauch auf Objektkrediten (OKs)  
+❌ **Mühsame manuelle PDF-Reports** für einfache Budget-Abfragen  
+❌ **Unübersichtliche Einzelbuchungen** ohne konsolidierte Ansicht  
+❌ **Fehlende Transparenz** bei Multi-OK-Konten  
+❌ **Keine proaktiven Warnungen** bei Budgetüberschreitungen
+
+### Die Lösung: ZVV KontoRadar ✨
+
+Ein modernes, Echtzeit-Dashboard, das Projektleitern und Budgetverantwortlichen eine **konsolidierte, intelligente Sicht** auf alle Objektkredite bietet:
+
+✅ **Echtzeit Budget-Tracking** - Sofortiger Überblick: Budget vs. Verbrauch vs. Verfügbar  
+✅ **Multi-Level Aggregation** - Von Konto-Ebene bis zur Einzelbuchung  
+✅ **Intelligente Filterung** - Nach Datum, Status, Konto, OK und Betrag  
+✅ **Analytics & Trends** - Burn-Down-Charts, Forecasting, Anomalie-Erkennung  
+✅ **Saved Views** - Persönliche Filterkonfigurationen für wiederkehrende Analysen  
+✅ **Mobile-First** - Budgetübersicht überall und jederzeit
+
+---
 
 ## 📋 Überblick
 
-ZVV KontoRadar ist ein modernes, responsives Dashboard, das Projektleitern und Budgetverantwortlichen im ZVV eine konsolidierte Sicht auf alle Objektkredite (OKs) und deren Budgetverbrauch bietet. Das System ermöglicht intelligente Filterung, Gruppierung und Analyse von Budgetdaten.
+**ZVV KontoRadar** transformiert granulare Buchungsdaten aus Abacus/MayBacus in actionable Insights für Finanzverantwortliche im öffentlichen Verkehr.
+
+### 🎭 User Stories & Use Cases
+
+#### 👨‍💼 Projektleiter
+> *"Ich möchte auf einen Blick sehen, wie viel Budget auf meinen OKs noch verfügbar ist, ohne PDFs durchsuchen zu müssen."*
+
+- ✅ Echtzeit-Übersicht aller zugeordneten Objektkredite
+- ✅ Farbcodierte Budget-Ampel (grün >50%, gelb 20-50%, rot <20%)
+- ✅ Drill-Down zu Einzelbuchungen mit Such- und Filterfunktion
+- ✅ Export für Reporting und Dokumentation
+
+#### 👩‍💻 Finanzcontroller
+> *"Ich brauche konsolidierte Auswertungen über alle Konten und OKs hinweg für Monatsreports."*
+
+- ✅ Account-Übersicht mit aggregierten Summen aller untergeordneten OKs
+- ✅ Trend-Analysen und Burn-Down-Charts
+- ✅ Anomalie-Erkennung bei ungewöhnlichen Buchungen
+- ✅ Custom Views für wiederkehrende Analysen
+
+#### 🏢 Management
+> *"Ich möchte Portfolio-weite Budget-Insights für strategische Entscheidungen."*
+
+- ✅ Executive Dashboard mit KPIs
+- ✅ Vergleiche über verschiedene Bereiche (IT, Infrastruktur, etc.)
+- ✅ Forecasting basierend auf historischen Verbrauchsmustern
+- ✅ Risiko-Analyse für potenzielle Budget-Überschreitungen
 
 ### ✨ Hauptfunktionen
 
@@ -21,6 +79,8 @@ ZVV KontoRadar ist ein modernes, responsives Dashboard, das Projektleitern und B
 - **📱 Responsive Design** - Optimiert für Desktop, Tablet und Mobile
 - **🌙 Dark/Light Mode** - Automatische Tageszeit-Erkennung
 - **🎨 ZVV Design System** - Offizielle ZVV Brown Narrow Typographie
+- **⚡ Performance** - Optimierte Queries mit PostgreSQL Views
+- **🔒 Security** - Row Level Security (RLS) auf Datenbankebene
 
 ## 🏗️ Technologie-Stack
 
@@ -42,6 +102,89 @@ ZVV KontoRadar ist ein modernes, responsives Dashboard, das Projektleitern und B
 - **Accessibility** - WCAG 2.1 konform
 
 ## 📊 Datenmodell
+
+### Architektur-Übersicht
+
+```mermaid
+erDiagram
+    ACCOUNT ||--o{ OBJECT_CREDIT : "hat"
+    OBJECT_CREDIT ||--o{ BOOKING : "enthält"
+    ACCOUNT ||--o{ BOOKING : "referenziert"
+    IMPORT_BATCH ||--o{ BOOKING : "importiert"
+
+    ACCOUNT {
+        uuid account_id PK
+        varchar konto_nr UK "z.B. 3911000000"
+        varchar account_name "z.B. Vergütung IT-Dienstleistungen"
+        char currency "CHF"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    OBJECT_CREDIT {
+        uuid ok_id PK
+        varchar ok_nr UK "z.B. 15982"
+        uuid account_id FK
+        varchar title "Projektname"
+        decimal budget_total "Gesamtbudget"
+        date start_date
+        date end_date
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    BOOKING {
+        bigserial id PK
+        uuid ok_id FK
+        uuid account_id FK
+        uuid import_batch_id FK
+        date booking_date "Buchungsdatum"
+        varchar beleg_nr "Belegnummer"
+        text text_long "Buchungstext"
+        varchar gegenkonto "Gegenkonto"
+        decimal amount "Betrag (negativ = Aufwand)"
+        char currency "CHF"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    IMPORT_BATCH {
+        uuid id PK
+        varchar source "Abacus/MayBacus"
+        varchar source_file_name
+        varchar source_file_hash
+        timestamptz imported_at
+    }
+```
+
+### Business Rules
+
+1. **1 : N Beziehung** - Ein Konto kann mehrere Objektkredite enthalten
+2. **1 : N Beziehung** - Ein Objektkredit hat mehrere Buchungen
+3. **Aggregation über Views** - Budgetverbrauch wird nicht gespeichert, sondern berechnet
+4. **Referentielle Integrität** - Jede Buchung muss zu einem gültigen OK und Account gehören
+5. **Constraint Check** - `booking.account_id` muss mit `object_credit.account_id` übereinstimmen
+6. **Audit Trail** - `import_batch` trackt die Herkunft jeder Buchung
+
+### Beispiel: Reale Datenstruktur
+
+```
+📁 Konto: 3911000000 - Vergütung für Informatikdienstleistungen
+│
+├── 📋 OK 15982 - SAP S/4HANA Migration
+│   ├── Budget: CHF 500'000
+│   ├── Spent: CHF -198'420.15
+│   └── Available: CHF 301'579.85
+│       │
+│       ├── 💳 Buchung #133292 | 13.03.2025 | KANTON ZÜRICH | -55'758.25
+│       ├── 💳 Buchung #133845 | 28.03.2025 | ABRAXAS AG | -82'450.00
+│       └── 💳 Buchung #134102 | 15.04.2025 | IBM SCHWEIZ | -60'211.90
+│
+└── 📋 OK 16104 - Cybersecurity Infrastructure
+    ├── Budget: CHF 250'000
+    ├── Spent: CHF -87'250.00
+    └── Available: CHF 162'750.00
+```
 
 ### Hauptentitäten
 

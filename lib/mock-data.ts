@@ -242,12 +242,11 @@ const generateHistoricalData = () => {
     return {
       account_id: account.id,
       konto_nr: account.nr,
-      name: account.name,
+      account_name: account.name,
       ok_count: accountOKs.length,
       total_budget: totalBudget,
       total_spent: totalSpent,
-      total_available: totalAvailable,
-      currency: 'CHF'
+      total_available: totalAvailable
     }
   })
 
