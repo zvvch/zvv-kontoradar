@@ -117,17 +117,17 @@ const generateHistoricalData = () => {
   let okId = 1
   let bookingId = 1
 
-  // Generiere 500 OKs mit 2024 und 2025 Daten
-  // Verwende nur die ersten 12 Konten für bessere Sichtbarkeit
-  const activeAccounts = accounts.slice(0, 12)
+  // Generiere 50 OKs mit 2024 und 2025 Daten - übersichtliche Testdaten
+  // Verwende die ersten 25 Konten für realistische Verteilung
+  const activeAccounts = accounts.slice(0, 25)
   
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 50; i++) {
     const account = activeAccounts[i % activeAccounts.length]
     const template = okTemplates[i % okTemplates.length]
     const name = template.names[i % template.names.length]
     
     // Bestimme Jahr basierend auf Index (60% 2024, 40% 2025)
-    const is2025 = i > 300
+    const is2025 = i > 30
     const year = is2025 ? 2025 : 2024
     const yearPrefix = is2025 ? '25' : '24'
     const okNr = `${template.prefix}${yearPrefix}${String(i % 1000).padStart(3, '0')}`
@@ -186,8 +186,8 @@ const generateHistoricalData = () => {
       lastBooking = new Date(2024, endMonth, endDay)
     }
     
-    // Generiere 8-30 Buchungen pro OK für spannendere Burn-Down Charts
-    const bookingCount = Math.floor(Math.random() * 22) + 8
+    // Generiere 2-8 Buchungen pro OK (durchschnittlich 4, gesamt ca. 200 Buchungen)
+    const bookingCount = Math.floor(Math.random() * 7) + 2
     
     const ok: OKOverview = {
       ok_id: okId.toString(),
