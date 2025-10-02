@@ -1037,7 +1037,7 @@ export function SmartDashboard() {
       </div>
 
       {/* Tabellen */}
-      <div className="flex-1 flex flex-col overflow-hidden p-4 sm:p-6">
+      <div className="flex-1 flex flex-col p-4 sm:p-6">
         <div className="max-w-7xl mx-auto w-full space-y-6">
           {/* OK-Übersicht Tabelle (immer sichtbar, fixe kompakte Höhe) */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">

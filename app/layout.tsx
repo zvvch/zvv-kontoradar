@@ -7,6 +7,7 @@ import { FontSizeSwitcher } from '@/components/FontSizeSwitcher'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PerformanceMonitor } from '@/components/PerformanceMonitor'
 import { LogoLink } from '@/components/LogoLink'
+import { Footer } from '@/components/Footer'
 import { Github } from 'lucide-react'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -58,11 +59,11 @@ export default function RootLayout({
             <header className="flex-shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
               <div className="w-full px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-3">
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-4 flex-1 sm:flex-initial justify-center sm:justify-start">
                     <LogoLink />
                   </div>
                   
-                  <nav className="flex items-center gap-3">
+                  <nav className="hidden sm:flex items-center gap-2 sm:gap-3">
                     <a 
                       href="https://github.com/zvvch/zvv-kontoradar" 
                       target="_blank" 
@@ -80,11 +81,16 @@ export default function RootLayout({
             </header>
             
             {/* Full-Screen Content Area */}
-            <main className="flex-1 overflow-hidden">
-              <div className="h-full w-full">
-                <ErrorBoundary>
-                  {children}
-                </ErrorBoundary>
+            <main className="flex-1 overflow-auto">
+              <div className="min-h-full flex flex-col">
+                <div className="flex-1">
+                  <ErrorBoundary>
+                    {children}
+                  </ErrorBoundary>
+                </div>
+                
+                {/* Footer */}
+                <Footer />
               </div>
             </main>
           </div>
