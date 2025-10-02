@@ -81,9 +81,9 @@ export default function RootLayout({
             </header>
             
             {/* Full-Screen Content Area */}
-            <main className="flex-1 overflow-auto">
-              <div className="min-h-full flex flex-col">
-                <div className="flex-1">
+            <main className="flex-1 overflow-hidden sm:overflow-auto">
+              <div className="h-full sm:min-h-full flex flex-col">
+                <div className="flex-1 overflow-hidden sm:overflow-visible">
                   <ErrorBoundary>
                     {children}
                   </ErrorBoundary>

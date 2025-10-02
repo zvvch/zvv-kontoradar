@@ -244,10 +244,10 @@ export default function OKDetailPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-4 sm:p-6">
+      <div className="flex-1 overflow-auto p-4 sm:p-6">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* OK Overview Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
               <div className="flex items-center space-x-3">
                 <div className="p-2 rounded-lg bg-blue-600">
