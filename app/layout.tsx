@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
-  title: 'ZVV | KontoRadar 💸',
+  title: 'ZVV | KontoRadar',
   description: 'Echtzeit-Überwachung von Objektkrediten und Budgetverbrauch beim Zürcher Verkehrsverbund. Intelligente Burn-Down Charts, Filter-Funktionen und detaillierte Auswertungen für effizientes Finanzcontrolling.',
   keywords: 'ZVV, Budget, Objektkredite, ÖV, Verkehr, Zürich, Dashboard, Finanzcontrolling, Burn-Down Chart',
   authors: [{ name: 'Zürcher Verkehrsverbund' }],
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     icon: '/favicon.svg',
   },
   openGraph: {
-    title: 'ZVV | KontoRadar 💸',
+    title: 'ZVV | KontoRadar',
     description: 'Echtzeit-Überwachung von Objektkrediten und Budgetverbrauch beim Zürcher Verkehrsverbund. Intelligente Burn-Down Charts, Filter-Funktionen und detaillierte Auswertungen für effizientes Finanzcontrolling.',
     url: 'https://kontoradar.zvv.dev',
     siteName: 'ZVV KontoRadar',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ZVV | KontoRadar 💸',
+    title: 'ZVV | KontoRadar',
     description: 'Echtzeit-Überwachung von Objektkrediten und Budgetverbrauch beim Zürcher Verkehrsverbund. Intelligente Burn-Down Charts und detaillierte Auswertungen.',
     images: ['/og-image.png'],
   },
