@@ -1031,13 +1031,13 @@ export function SmartDashboard() {
               PDF Export
             </button>
           )}
-            </div>
           </div>
         </div>
+      </div>
 
-        {/* Tabellen */}
-          {/* OK-Übersicht Tabelle (immer sichtbar, fixe kompakte Höhe) */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      {/* Tabellen */}
+      {/* OK-Übersicht Tabelle (immer sichtbar, fixe kompakte Höhe) */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
             <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'} ${shouldShowBookings ? 'max-h-32' : ''} overflow-y-auto scrollbar-thin`}>
               <table className="w-full text-sm border-collapse" id="ok-table">
                 <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 shadow-sm border-b border-gray-300 dark:border-gray-600">
@@ -1342,10 +1342,9 @@ export function SmartDashboard() {
             </div>
           </div>
         )}
-        
+
         </div>
       </div>
-
     </div>
   )
 }
