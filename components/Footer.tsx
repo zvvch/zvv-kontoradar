@@ -34,14 +34,14 @@ export function Footer() {
           </div>
           
           <div className="flex items-center gap-2">
-            <span>Developed by</span>
             <a 
-              href="https://github.com/marcelrapold" 
+              href="https://github.com/zvvzh" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="font-medium text-primary-600 dark:text-primary-400 hover:underline"
+              className="font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1.5"
             >
-              marcelrapold
+              <Github className="h-4 w-4" />
+              ZVV on GitHub
             </a>
             <span>·</span>
             <span className="flex items-center gap-1">
@@ -56,15 +56,7 @@ export function Footer() {
         <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
           <div>© {currentYear} ZVV</div>
           <div className="flex items-center justify-center gap-1">
-            Made with <Heart className="h-3 w-3 text-red-500 fill-red-500" /> by{' '}
-            <a 
-              href="https://github.com/marcelrapold" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="font-medium text-primary-600 dark:text-primary-400 hover:underline"
-            >
-              marcelrapold
-            </a>
+            Made with <Heart className="h-3 w-3 text-red-500 fill-red-500" /> and <Sparkles className="h-3 w-3 text-yellow-500" /> AI
           </div>
         </div>
       </div>
