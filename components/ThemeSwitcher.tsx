@@ -1,7 +1,7 @@
 'use client'
 
 import { useTheme } from '@/lib/theme'
-import { Sun, Moon, Monitor } from 'lucide-react'
+import { Sun, Moon, Clock } from 'lucide-react'
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme()
@@ -11,7 +11,9 @@ export function ThemeSwitcher() {
       {/* Glassmorphism Background Slider */}
       <div 
         className={`absolute top-1 bottom-1 w-8 rounded-lg bg-[#0479cc] shadow-lg transition-all duration-300 ease-out ${
-          theme === 'light' ? 'left-1' : 'left-[calc(50%+2px)]'
+          theme === 'light' ? 'left-1' : 
+          theme === 'dark' ? 'left-[calc(33.33%+4px)]' : 
+          'left-[calc(66.66%+7px)]'
         }`}
       />
       
@@ -40,6 +42,20 @@ export function ThemeSwitcher() {
       >
         <Moon className={`h-3.5 w-3.5 transition-all duration-300 ${
           theme === 'dark' ? '' : 'group-hover:rotate-12'
+        }`} />
+      </button>
+
+      <button
+        onClick={() => setTheme('auto')}
+        className={`relative z-10 w-8 h-8 rounded-lg transition-all duration-300 flex items-center justify-center group ${
+          theme === 'auto'
+            ? 'text-white'
+            : 'text-[#0479cc] dark:text-[#5ba3f5] hover:text-[#0056b3] hover:scale-110 hover:bg-white/20 dark:hover:bg-white/10'
+        }`}
+        title="Auto (9-17 Uhr)"
+      >
+        <Clock className={`h-3.5 w-3.5 transition-all duration-300 ${
+          theme === 'auto' ? '' : 'group-hover:rotate-12'
         }`} />
       </button>
     </div>
