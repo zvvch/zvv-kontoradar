@@ -2,10 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ZVV Official Font Stack - Frutiger with professional fallbacks */
+/* ZVV Official Fonts - Unified Font Family with Weights */
+@font-face {
+  font-family: 'ZVV Brown Narrow';
+  src: url('/font/ZVVBrownNarrowSWeb-Regular.woff2') format('woff2'),
+       url('/font/ZVVBrownNarrowSWeb-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ZVV Brown Narrow';
+  src: url('/font/ZVVBrownNarrowSWeb-Italic.woff2') format('woff2'),
+       url('/font/ZVVBrownNarrowSWeb-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'ZVV Brown Narrow';
+  src: url('/font/ZVVBrownNarrowSWeb-Bold.woff2') format('woff2'),
+       url('/font/ZVVBrownNarrowSWeb-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ZVV Brown Narrow';
+  src: url('/font/ZVVBrownNarrowSWeb-BoldItalic.woff2') format('woff2'),
+       url('/font/ZVVBrownNarrowSWeb-BoldItalic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'ZVV Brown Narrow';
+  src: url('/font/ZVVBrownNarrowSWeb-Black.woff2') format('woff2'),
+       url('/font/ZVVBrownNarrowSWeb-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ZVV Brown Narrow';
+  src: url('/font/ZVVBrownNarrowSWeb-BlackItalic.woff2') format('woff2'),
+       url('/font/ZVVBrownNarrowSWeb-BlackItalic.woff') format('woff');
+  font-weight: 900;
+  font-style: italic;
+}
+
+/* ZVV Official Typography System - Brown Narrow with Material Design 3 */
 @layer base {
   :root {
-    /* Material Design 3 Type Scale - Optimiert für ZVV */
+    /* Material Design 3 Type Scale - Optimiert für ZVV Brown Narrow */
     --font-size-display-lg: 3.5625rem;    /* 57px */
     --font-size-display-md: 2.8125rem;    /* 45px */
     --font-size-display-sm: 2.25rem;      /* 36px */
@@ -24,8 +73,8 @@
   }
 
   html {
-    /* ZVV Official Font: Frutiger Neue with professional fallbacks */
-    font-family: 'Frutiger Neue', 'Frutiger', 'Univers', 'Calibri', 'Gill Sans', 'Gill Sans MT', 'Myriad Pro', 'Myriad', 'DejaVu Sans Condensed', 'Liberation Sans', 'Nimbus Sans L', 'Tahoma', 'Geneva', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    /* ZVV Official Font: Brown Narrow with professional fallbacks */
+    font-family: 'ZVV Brown Narrow', 'Univers', 'Calibri', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
     font-size: 16px; /* Base 16px für bessere Accessibility */
     line-height: 1.5; /* Material Design Baseline */
   }
@@ -41,45 +90,45 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Material Design 3 Typography Scale */
+  /* Material Design 3 Typography Scale - Angepasst für ZVV Brown Narrow */
   h1 {
     font-size: var(--font-size-headline-lg); /* 32px */
-    font-weight: 500; /* Medium */
+    font-weight: 700; /* Bold */
     line-height: 1.25; /* 40px */
     letter-spacing: 0;
   }
 
   h2 {
     font-size: var(--font-size-headline-md); /* 28px */
-    font-weight: 500;
+    font-weight: 700; /* Bold */
     line-height: 1.286; /* 36px */
     letter-spacing: 0;
   }
 
   h3 {
     font-size: var(--font-size-headline-sm); /* 24px */
-    font-weight: 500;
+    font-weight: 700; /* Bold */
     line-height: 1.333; /* 32px */
     letter-spacing: 0;
   }
 
   h4 {
     font-size: var(--font-size-title-lg); /* 22px */
-    font-weight: 500;
+    font-weight: 700; /* Bold */
     line-height: 1.455; /* 32px */
     letter-spacing: 0;
   }
 
   h5 {
     font-size: var(--font-size-title-md); /* 16px */
-    font-weight: 600; /* Semi-bold */
+    font-weight: 700; /* Bold */
     line-height: 1.5; /* 24px */
     letter-spacing: 0.009375em;
   }
 
   h6 {
     font-size: var(--font-size-title-sm); /* 14px */
-    font-weight: 600;
+    font-weight: 700; /* Bold */
     line-height: 1.429; /* 20px */
     letter-spacing: 0.0071428571em;
   }
