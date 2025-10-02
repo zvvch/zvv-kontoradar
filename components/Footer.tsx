@@ -82,28 +82,36 @@ export function Footer() {
             border-b border-gray-200 dark:border-gray-700
             transition-all duration-300 ease-out
             ${isNearBottom 
-              ? 'max-h-20 opacity-100' 
+              ? 'max-h-24 opacity-100' 
               : 'max-h-0 opacity-0 overflow-hidden'
             }
           `}
         >
-          <div className="px-6 py-3 max-w-7xl mx-auto">
-            <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-              <a 
-                href="https://github.com/zvvzh" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1.5"
-              >
-                <Github className="h-4 w-4" />
-                ZVV on GitHub
-              </a>
-              <span>·</span>
-              <span className="flex items-center gap-1">
-                Made with <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500" /> and <Sparkles className="h-3.5 w-3.5 text-yellow-500" /> AI
-              </span>
-              <span>·</span>
-              <span className="text-xs text-orange-600 dark:text-orange-400">v0.1 Testdaten</span>
+          <div className="px-6 py-4 max-w-7xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                <a 
+                  href="https://github.com/zvvzh" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1.5"
+                >
+                  <Github className="h-4 w-4" />
+                  ZVV on GitHub
+                </a>
+                <span>·</span>
+                <span className="flex items-center gap-1">
+                  Made with <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500" /> and <Sparkles className="h-3.5 w-3.5 text-yellow-500" /> AI
+                </span>
+                <span>·</span>
+                <span className="text-xs text-orange-600 dark:text-orange-400">v0.1 Testdaten</span>
+              </div>
+              
+              {/* Controls from Header */}
+              <div className="flex items-center gap-3">
+                <FontSizeSwitcher />
+                <ThemeSwitcher />
+              </div>
             </div>
           </div>
         </div>
