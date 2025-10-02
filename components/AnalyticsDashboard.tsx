@@ -8,6 +8,18 @@ import {
   Calendar, DollarSign, Target, AlertTriangle,
   CheckCircle, Clock, Users, Building2
 } from 'lucide-react'
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell
+} from 'recharts'
 
 interface AnalyticsData {
   totalBudget: number
@@ -123,6 +135,30 @@ export function AnalyticsDashboard() {
       maximumFractionDigits: 0,
     }).format(amount)
   }
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4">
+          <p className="font-semibold text-gray-900 dark:text-white mb-2">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center space-x-2">
+              <div 
+                className="w-3 h-3 rounded-full" 
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {entry.name}: {formatCurrency(entry.value)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )
+    }
+    return null
+  }
+
+  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']
 
   if (loading) {
     return (
@@ -294,7 +330,7 @@ export function AnalyticsDashboard() {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Utilization Distribution */}
+        {/* Utilization Distribution - Pie Chart */}
         <div className="glass-card p-6">
           <div className="flex items-center space-x-3 mb-6">
             <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600">
@@ -303,32 +339,30 @@ export function AnalyticsDashboard() {
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Auslastungsverteilung</h3>
           </div>
           
-          <div className="space-y-4">
-            {analyticsData.utilizationDistribution.map((item, index) => {
-              const percentage = (item.count / okOverviews.length) * 100
-              const colors = ['bg-green-500', 'bg-blue-500', 'bg-orange-500', 'bg-red-500']
-              
-              return (
-                <div key={item.range} className="flex items-center space-x-4">
-                  <div className="w-20 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {item.range}
-                  </div>
-                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                    <div 
-                      className={`h-3 rounded-full ${colors[index]} transition-all duration-1000`}
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                  </div>
-                  <div className="w-12 text-sm font-bold text-gray-900 dark:text-white">
-                    {item.count}
-                  </div>
-                </div>
-              )
-            })}
+          <div className="h-80 min-h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsPieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <Pie
+                  data={analyticsData.utilizationDistribution}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ range, count, percent }: any) => `${range}: ${count} (${((percent as number) * 100).toFixed(0)}%)`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="count"
+                >
+                  {analyticsData.utilizationDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </RechartsPieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Top Accounts */}
+        {/* Top Accounts - Bar Chart */}
         <div className="glass-card p-6">
           <div className="flex items-center space-x-3 mb-6">
             <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
@@ -337,42 +371,46 @@ export function AnalyticsDashboard() {
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Top Konten</h3>
           </div>
           
-          <div className="space-y-4">
-            {analyticsData.topAccounts.map((account, index) => {
-              const utilization = (account.spent / account.budget) * 100
-              
-              return (
-                <div key={account.name} className="flex items-center space-x-4">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {account.name}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatCurrency(account.spent)} / {formatCurrency(account.budget)}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-gray-900 dark:text-white">
-                      {utilization.toFixed(1)}%
-                    </div>
-                    <div className={`text-xs ${
-                      utilization > 80 ? 'text-red-500' : 
-                      utilization > 50 ? 'text-orange-500' : 'text-green-500'
-                    }`}>
-                      {utilization > 80 ? 'Kritisch' : utilization > 50 ? 'Warnung' : 'Gesund'}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+          <div className="h-80 min-h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart 
+                data={analyticsData.topAccounts}
+                margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10, fill: 'currentColor' }}
+                  className="text-gray-600 dark:text-gray-400"
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10, fill: 'currentColor' }}
+                  className="text-gray-600 dark:text-gray-400"
+                  tickFormatter={(value) => {
+                    if (value >= 1000000) {
+                      return `${(value / 1000000).toFixed(1)}M`
+                    } else if (value >= 1000) {
+                      return `${(value / 1000).toFixed(0)}k`
+                    }
+                    return value.toString()
+                  }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar 
+                  dataKey="spent" 
+                  fill="#8b5cf6"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* Monthly Trend */}
+      {/* Monthly Trend - Bar Chart */}
       <div className="glass-card p-6">
         <div className="flex items-center space-x-3 mb-6">
           <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-green-600">
@@ -381,27 +419,45 @@ export function AnalyticsDashboard() {
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Monatlicher Trend</h3>
         </div>
         
-        <div className="grid grid-cols-5 gap-4">
-          {analyticsData.monthlyTrend.map((month, index) => {
-            const utilization = (month.spent / month.budget) * 100
-            
-            return (
-              <div key={month.month} className="text-center">
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {month.month}
-                </div>
-                <div className="relative h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2">
-                  <div 
-                    className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary-500 to-primary-400 rounded-lg transition-all duration-1000"
-                    style={{ height: `${Math.min(utilization, 100)}%` }}
-                  ></div>
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {utilization.toFixed(0)}%
-                </div>
-              </div>
-            )
-          })}
+        <div className="h-80 min-h-[320px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart 
+              data={analyticsData.monthlyTrend}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+              <XAxis 
+                dataKey="month" 
+                tick={{ fontSize: 12, fill: 'currentColor' }}
+                className="text-gray-600 dark:text-gray-400"
+              />
+              <YAxis 
+                tick={{ fontSize: 12, fill: 'currentColor' }}
+                className="text-gray-600 dark:text-gray-400"
+                tickFormatter={(value) => {
+                  if (value >= 1000000) {
+                    return `${(value / 1000000).toFixed(1)}M`
+                  } else if (value >= 1000) {
+                    return `${(value / 1000).toFixed(0)}k`
+                  }
+                  return value.toString()
+                }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar 
+                dataKey="budget" 
+                fill="#10b981"
+                radius={[4, 4, 0, 0]}
+                name="Budget"
+              />
+              <Bar 
+                dataKey="spent" 
+                fill="#ef4444"
+                radius={[4, 4, 0, 0]}
+                name="Verbraucht"
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
