@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { ChevronDown, Search, X, Filter } from 'lucide-react'
+import { ChevronDown, Search, X, Filter, SortAsc, SortDesc } from 'lucide-react'
 
 interface ColumnFilterProps {
   column: string
@@ -12,6 +12,10 @@ interface ColumnFilterProps {
   type?: 'text' | 'select'
   placeholder?: string
   align?: 'left' | 'right' | 'center'
+  sortable?: boolean
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+  onSort?: (column: string) => void
 }
 
 export function ColumnFilter({
@@ -22,7 +26,11 @@ export function ColumnFilter({
   onFilterChange,
   type = 'select',
   placeholder = 'Filter...',
-  align = 'left'
+  align = 'left',
+  sortable = false,
+  sortBy,
+  sortOrder,
+  onSort
 }: ColumnFilterProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -80,27 +88,53 @@ export function ColumnFilter({
     return (
       <div 
         ref={dropdownRef}
-        onClick={() => setIsOpen(!isOpen)}
-      className={`group cursor-pointer flex items-center space-x-2 font-semibold text-sm transition-all duration-200 px-4 py-3.5 h-full ${alignmentClass} ${
-        hasActiveFilters 
-          ? 'text-primary-600' 
-          : 'text-gray-800 dark:text-gray-200'
-      } hover:bg-primary-600 hover:text-white`}
-    >
-      <span className="group-hover:text-white">{label}</span>
-        {hasActiveFilters && (
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
-            1
-          </span>
+        className="relative flex items-center justify-center h-full"
+      >
+        <div 
+          className={`group cursor-pointer flex items-center space-x-2 font-semibold text-sm transition-all duration-200 px-4 py-3.5 h-full ${alignmentClass} ${
+            hasActiveFilters 
+              ? 'text-primary-600' 
+              : 'text-gray-800 dark:text-gray-200'
+          } hover:bg-primary-600 hover:text-white`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="group-hover:text-white">{label}</span>
+          {hasActiveFilters && (
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
+              1
+            </span>
+          )}
+          <ChevronDown className={`h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-all ${isOpen ? 'rotate-180' : ''}`} />
+          <Filter className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
+        </div>
+        
+        {/* Sort Button */}
+        {sortable && onSort && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onSort(column)
+            }}
+            className="px-2 py-3.5 hover:bg-primary-600 group transition-colors"
+            title="Sortieren"
+          >
+            {sortBy === column && sortOrder === 'asc' && (
+              <SortAsc className="h-3.5 w-3.5 text-primary-600 group-hover:text-white" />
+            )}
+            {sortBy === column && sortOrder === 'desc' && (
+              <SortDesc className="h-3.5 w-3.5 text-primary-600 group-hover:text-white" />
+            )}
+            {sortBy !== column && (
+              <SortAsc className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-50" />
+            )}
+          </button>
         )}
-        <ChevronDown className={`h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-all ${isOpen ? 'rotate-180' : ''}`} />
-        <Filter className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
 
 
         {/* Text-Filter Dialog */}
         {isOpen && (
           <div 
-            className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-3"
+            className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999] p-3"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="space-y-2">
@@ -141,27 +175,53 @@ export function ColumnFilter({
   return (
     <div 
       ref={dropdownRef}
-      onClick={() => setIsOpen(!isOpen)}
-      className={`group cursor-pointer flex items-center space-x-2 font-semibold text-sm transition-all duration-200 px-4 py-3.5 h-full ${alignmentClass} ${
-        hasActiveFilters 
-          ? 'text-primary-600' 
-          : 'text-gray-800 dark:text-gray-200'
-      } hover:bg-primary-600 hover:text-white`}
+      className="relative flex items-center justify-center h-full"
     >
-      <span className="group-hover:text-white">{label}</span>
-      {hasActiveFilters && (
-        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
-          {selectedValues.length}
-        </span>
+      <div 
+        className={`group cursor-pointer flex items-center space-x-2 font-semibold text-sm transition-all duration-200 px-4 py-3.5 h-full ${alignmentClass} ${
+          hasActiveFilters 
+            ? 'text-primary-600' 
+            : 'text-gray-800 dark:text-gray-200'
+        } hover:bg-primary-600 hover:text-white`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="group-hover:text-white">{label}</span>
+        {hasActiveFilters && (
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
+            {selectedValues.length}
+          </span>
+        )}
+        <ChevronDown className={`h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-all ${isOpen ? 'rotate-180' : ''}`} />
+        <Filter className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
+      </div>
+      
+      {/* Sort Button */}
+      {sortable && onSort && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onSort(column)
+          }}
+          className="px-2 py-3.5 hover:bg-primary-600 group transition-colors"
+          title="Sortieren"
+        >
+          {sortBy === column && sortOrder === 'asc' && (
+            <SortAsc className="h-3.5 w-3.5 text-primary-600 group-hover:text-white" />
+          )}
+          {sortBy === column && sortOrder === 'desc' && (
+            <SortDesc className="h-3.5 w-3.5 text-primary-600 group-hover:text-white" />
+          )}
+          {sortBy !== column && (
+            <SortAsc className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-50" />
+          )}
+        </button>
       )}
-      <ChevronDown className={`h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-all ${isOpen ? 'rotate-180' : ''}`} />
-      <Filter className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
 
 
       {/* Dropdown-Filter Dialog */}
       {isOpen && (
         <div 
-          className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden"
+          className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999] max-h-96 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Suchfeld */}

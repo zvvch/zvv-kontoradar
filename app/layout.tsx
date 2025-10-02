@@ -1,25 +1,27 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Link from 'next/link'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { FontSizeSwitcher } from '@/components/FontSizeSwitcher'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PerformanceMonitor } from '@/components/PerformanceMonitor'
+import { Github } from 'lucide-react'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
-  title: 'ZVV KontoRadar',
+  title: 'Zürcher Verkehrsverbund (ZVV) | KontoRadar | v0.1',
   description: 'Intelligentes Dashboard für Objektkredite und Budgetverbrauch im Zürcher Verkehrsverbund',
   keywords: 'ZVV, Budget, Objektkredite, ÖV, Verkehr, Zürich, Dashboard',
   authors: [{ name: 'Zürcher Verkehrsverbund' }],
   openGraph: {
-    title: 'ZVV KontoRadar',
+    title: 'Zürcher Verkehrsverbund (ZVV) | KontoRadar | v0.1',
     description: 'Intelligentes Dashboard für Objektkredite und Budgetverbrauch',
     url: 'https://kontoradar.zvv.dev',
-    siteName: 'KontoRadar',
+    siteName: 'ZVV KontoRadar',
     locale: 'de_CH',
     type: 'website',
   },
@@ -40,29 +42,33 @@ export default function RootLayout({
               <div className="w-full px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-3">
                   <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-3">
+                    <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
                       <img 
                         src="/zvv-logo.svg" 
                         alt="ZVV Logo" 
                         className="h-10 w-auto dark:invert"
                       />
-                      <div>
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-normal text-black dark:text-white">
-            Kontoradar
-          </h1>
-          <span className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-2 py-0.5 rounded-full font-medium">
-            v0.1 Alpha
-          </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            Testdaten
-          </span>
-        </div>
-                      </div>
-                    </div>
+                      <h1 className="text-xl font-normal text-black dark:text-white flex items-center gap-2">
+                        <span>KontoRadar</span>
+                        <span className="text-gray-400 dark:text-gray-500">|</span>
+                        <span className="text-sm text-orange-600 dark:text-orange-400">v0.1</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          Testdaten
+                        </span>
+                      </h1>
+                    </Link>
                   </div>
                   
                   <nav className="flex items-center gap-3">
+                    <a 
+                      href="https://github.com/zvvch/zvv-kontoradar" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors no-print"
+                      title="GitHub Repository"
+                    >
+                      <Github className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                    </a>
                     <FontSizeSwitcher />
                     <ThemeSwitcher />
                   </nav>

@@ -118,14 +118,18 @@ DeepBox → MyAbacus → [Rechnungsfreigabe]
 ### ✨ Hauptfunktionen
 
 - **🎯 Intelligentes Dashboard** - Konsolidierte Sicht für alle Benutzergruppen
-- **📊 Analytics & Insights** - Detaillierte Auswertungen und Trends
+- **📊 Analytics & Insights** - Detaillierte Auswertungen und Trends mit Burn-Down Charts
+- **📈 Burn-Down Chart** - Visualisierung des Budget-Verbrauchs über das Jahr mit Jahresauswahl
+- **📄 PDF Export** - Professioneller PDF-Export mit optimiertem Druck-Layout (A4 Landscape)
 - **🔍 Erweiterte Filterung** - Nach Datum, Budget, Status, Konto und OK
 - **💾 Gespeicherte Ansichten** - Persönliche Filterkonfigurationen
 - **📱 Responsive Design** - Optimiert für Desktop, Tablet und Mobile
-- **🌙 Dark/Light Mode** - Automatische Tageszeit-Erkennung
-- **🎨 ZVV Design System** - Offizielle ZVV Brown Narrow Typographie
+- **🌙 Dark/Light Mode** - Automatische Tageszeit-Erkennung mit Theme-Switcher
+- **🔤 Font-Size Switcher** - Anpassbare Schriftgröße für bessere Lesbarkeit
+- **🎨 ZVV Design System** - Offizielle Frutiger Schriftart mit Material Design Typografie
 - **⚡ Performance** - Optimierte Queries mit PostgreSQL Views
 - **🔒 Security** - Row Level Security (RLS) auf Datenbankebene
+- **🔗 GitHub Integration** - Direkter Link zum Open-Source Repository
 
 ## 🏗️ Technologie-Stack
 

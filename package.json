@@ -1,6 +1,7 @@
 {
-  "name": "zvv-kreditorenworkflow-dashboard",
+  "name": "zvv-kontoradar",
   "version": "0.1.0",
+  "description": "Intelligentes Budget-Dashboard für Objektkredite im Zürcher Verkehrsverbund",
   "private": true,
   "scripts": {
     "dev": "next dev",

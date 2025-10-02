@@ -1,15 +1,19 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Calendar, ChevronDown, X, Check, Filter } from 'lucide-react'
+import { Calendar, ChevronDown, X, Check, Filter, SortAsc, SortDesc } from 'lucide-react'
 
 interface DateFilterProps {
   selectedValues: string[]
   onFilterChange: (values: string[]) => void
   availableDates: Date[]
+  sortable?: boolean
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+  onSort?: () => void
 }
 
-export function DateFilter({ selectedValues, onFilterChange, availableDates }: DateFilterProps) {
+export function DateFilter({ selectedValues, onFilterChange, availableDates, sortable = false, sortBy, sortOrder, onSort }: DateFilterProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'year' | 'month'>('year')
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -88,26 +92,52 @@ export function DateFilter({ selectedValues, onFilterChange, availableDates }: D
   return (
     <div 
       ref={dropdownRef}
-      onClick={() => setIsOpen(!isOpen)}
-      className={`group cursor-pointer flex items-center space-x-2 font-semibold text-sm transition-all duration-200 px-4 py-3.5 h-full justify-center ${
-        hasActiveFilters 
-          ? 'text-primary-600' 
-          : 'text-gray-800 dark:text-gray-200'
-      } hover:bg-primary-600 hover:text-white`}
+      className="relative flex items-center justify-center h-full"
     >
-      <span className="group-hover:text-white">Datum</span>
-      {hasActiveFilters && (
-        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
-          {selectedValues.length}
-        </span>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`group cursor-pointer flex items-center space-x-2 font-semibold text-sm transition-all duration-200 px-4 py-3.5 h-full justify-center ${
+          hasActiveFilters 
+            ? 'text-primary-600' 
+            : 'text-gray-800 dark:text-gray-200'
+        } hover:bg-primary-600 hover:text-white`}
+      >
+        <span className="group-hover:text-white">Datum</span>
+        {hasActiveFilters && (
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
+            {selectedValues.length}
+          </span>
+        )}
+        <ChevronDown className={`h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-all ${isOpen ? 'rotate-180' : ''}`} />
+        <Filter className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
+      </div>
+      
+      {/* Sort Button */}
+      {sortable && onSort && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onSort()
+          }}
+          className="px-2 py-3.5 hover:bg-primary-600 group transition-colors"
+          title="Sortieren"
+        >
+          {sortBy === 'first_booking' && sortOrder === 'asc' && (
+            <SortAsc className="h-3.5 w-3.5 text-primary-600 group-hover:text-white" />
+          )}
+          {sortBy === 'first_booking' && sortOrder === 'desc' && (
+            <SortDesc className="h-3.5 w-3.5 text-primary-600 group-hover:text-white" />
+          )}
+          {sortBy !== 'first_booking' && (
+            <SortAsc className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-50" />
+          )}
+        </button>
       )}
-      <ChevronDown className={`h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-all ${isOpen ? 'rotate-180' : ''}`} />
-      <Filter className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
 
       {/* Filter Dialog */}
       {isOpen && (
         <div 
-          className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+          className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
