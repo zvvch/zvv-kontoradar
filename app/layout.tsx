@@ -1,29 +1,46 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Link from 'next/link'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { FontSizeSwitcher } from '@/components/FontSizeSwitcher'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PerformanceMonitor } from '@/components/PerformanceMonitor'
+import { LogoLink } from '@/components/LogoLink'
 import { Github } from 'lucide-react'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
-  title: 'Zürcher Verkehrsverbund (ZVV) | KontoRadar | v0.1',
-  description: 'Intelligentes Dashboard für Objektkredite und Budgetverbrauch im Zürcher Verkehrsverbund',
-  keywords: 'ZVV, Budget, Objektkredite, ÖV, Verkehr, Zürich, Dashboard',
+  title: 'ZVV | KontoRadar 💸',
+  description: 'Echtzeit-Überwachung von Objektkrediten und Budgetverbrauch beim Zürcher Verkehrsverbund. Intelligente Burn-Down Charts, Filter-Funktionen und detaillierte Auswertungen für effizientes Finanzcontrolling.',
+  keywords: 'ZVV, Budget, Objektkredite, ÖV, Verkehr, Zürich, Dashboard, Finanzcontrolling, Burn-Down Chart',
   authors: [{ name: 'Zürcher Verkehrsverbund' }],
+  icons: {
+    icon: '/favicon.svg',
+  },
   openGraph: {
-    title: 'Zürcher Verkehrsverbund (ZVV) | KontoRadar | v0.1',
-    description: 'Intelligentes Dashboard für Objektkredite und Budgetverbrauch',
+    title: 'ZVV | KontoRadar 💸',
+    description: 'Echtzeit-Überwachung von Objektkrediten und Budgetverbrauch beim Zürcher Verkehrsverbund. Intelligente Burn-Down Charts, Filter-Funktionen und detaillierte Auswertungen für effizientes Finanzcontrolling.',
     url: 'https://kontoradar.zvv.dev',
     siteName: 'ZVV KontoRadar',
     locale: 'de_CH',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'ZVV KontoRadar Dashboard',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ZVV | KontoRadar 💸',
+    description: 'Echtzeit-Überwachung von Objektkrediten und Budgetverbrauch beim Zürcher Verkehrsverbund. Intelligente Burn-Down Charts und detaillierte Auswertungen.',
+    images: ['/og-image.png'],
   },
 }
 
@@ -42,21 +59,7 @@ export default function RootLayout({
               <div className="w-full px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-3">
                   <div className="flex items-center space-x-4">
-                    <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-                      <img 
-                        src="/zvv-logo.svg" 
-                        alt="ZVV Logo" 
-                        className="h-10 w-auto dark:invert"
-                      />
-                      <h1 className="text-xl font-normal text-black dark:text-white flex items-center gap-2">
-                        <span>KontoRadar</span>
-                        <span className="text-gray-400 dark:text-gray-500">|</span>
-                        <span className="text-sm text-orange-600 dark:text-orange-400">v0.1</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Testdaten
-                        </span>
-                      </h1>
-                    </Link>
+                    <LogoLink />
                   </div>
                   
                   <nav className="flex items-center gap-3">

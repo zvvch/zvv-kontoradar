@@ -7,7 +7,8 @@ import { OKOverview, AccountOverview, Booking, getBudgetStatus } from '@/lib/typ
 import { useResolvedTheme } from '@/lib/theme'
 import { ColumnFilter } from '@/components/ColumnFilter'
 import { DateFilter } from '@/components/DateFilter'
-import { BurnDownChart } from '@/components/BurnDownChart'
+import { BurnDownChartECharts } from '@/components/BurnDownChartECharts'
+import { BookingsTreemap } from '@/components/BookingsTreemap'
 import { 
   Search, Filter, SortAsc, SortDesc, Eye, Download, 
   TrendingUp, AlertTriangle, CheckCircle,
@@ -15,6 +16,33 @@ import {
   ChevronDown, X, Save, RefreshCw, Settings,
   BarChart3, PieChart, Activity, Zap, FileText
 } from 'lucide-react'
+
+interface TooltipProps {
+  text: string
+  children: React.ReactNode
+}
+
+function Tooltip({ text, children }: TooltipProps) {
+  const [isVisible, setIsVisible] = useState(false)
+
+  return (
+    <div 
+      className="relative inline-block"
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+    >
+      {children}
+      {isVisible && (
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-[10000] pointer-events-none max-w-xs">
+          {text}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-px">
+            <div className="border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface FilterState {
   search: string
@@ -63,6 +91,8 @@ export function SmartDashboard() {
   const [savedViews, setSavedViews] = useState<SavedView[]>([])
   const [currentView, setCurrentView] = useState<string>('default')
   const [selectedBurnDownYear, setSelectedBurnDownYear] = useState<number>(new Date().getFullYear())
+  const [bookingSortBy, setBookingSortBy] = useState<string>('booking_date')
+  const [bookingSortOrder, setBookingSortOrder] = useState<'asc' | 'desc'>('desc')
   
   const theme = useResolvedTheme()
 
@@ -73,8 +103,8 @@ export function SmartDashboard() {
     status: [],
     accounts: [],
     oks: [],
-    sortBy: 'ok_nr',
-    sortOrder: 'asc',
+    sortBy: 'first_booking',
+    sortOrder: 'desc',
     viewMode: 'table',
     groupBy: 'none',
     columnFilters: {
@@ -174,6 +204,9 @@ export function SmartDashboard() {
       }
     }
   }, [okOverviews, filters])
+
+  // Prüfe ob ein einzelnes OK gefiltert ist
+  const isOkFiltered = filters.columnFilters.ok_nr.length === 1
 
   // URL-Parameter für Filter anwenden
   const applyUrlFilters = () => {
@@ -444,6 +477,10 @@ export function SmartDashboard() {
         const statusOrder = { 'critical': 0, 'warning': 1, 'healthy': 2 }
         aVal = statusOrder[aStatus as keyof typeof statusOrder]
         bVal = statusOrder[bStatus as keyof typeof statusOrder]
+      } else if (filters.sortBy === 'first_booking' || filters.sortBy === 'last_booking') {
+        // Spezialbehandlung für Datumsfelder
+        aVal = a[filters.sortBy] ? new Date(a[filters.sortBy] as string).getTime() : 0
+        bVal = b[filters.sortBy] ? new Date(b[filters.sortBy] as string).getTime() : 0
       } else {
         aVal = a[filters.sortBy as keyof OKOverview]
         bVal = b[filters.sortBy as keyof OKOverview]
@@ -463,6 +500,16 @@ export function SmartDashboard() {
 
     return filtered
   }, [okOverviews, filters])
+
+  // Sortier-Funktion für Buchungen
+  const handleBookingSort = (column: string) => {
+    if (bookingSortBy === column) {
+      setBookingSortOrder(bookingSortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setBookingSortBy(column)
+      setBookingSortOrder('desc')
+    }
+  }
 
   // Gefilterte Buchungen für Buchungsansicht
   const filteredBookings = useMemo(() => {
@@ -495,11 +542,46 @@ export function SmartDashboard() {
       })
     }
 
-    // Sortiere nach Datum (neueste zuerst)
-    filtered.sort((a, b) => new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime())
+    // Sortierung
+    filtered.sort((a, b) => {
+      let aVal: any
+      let bVal: any
+      
+      switch (bookingSortBy) {
+        case 'booking_date':
+          aVal = new Date(a.booking_date).getTime()
+          bVal = new Date(b.booking_date).getTime()
+          break
+        case 'beleg_nr':
+          aVal = a.beleg_nr || ''
+          bVal = b.beleg_nr || ''
+          break
+        case 'text_long':
+          aVal = (a.text_long || '').toLowerCase()
+          bVal = (b.text_long || '').toLowerCase()
+          break
+        case 'gegenkonto':
+          aVal = a.gegenkonto || ''
+          bVal = b.gegenkonto || ''
+          break
+        case 'amount':
+          aVal = Math.abs(a.amount)
+          bVal = Math.abs(b.amount)
+          break
+        default:
+          aVal = new Date(a.booking_date).getTime()
+          bVal = new Date(b.booking_date).getTime()
+      }
+      
+      if (bookingSortOrder === 'asc') {
+        return aVal > bVal ? 1 : -1
+      } else {
+        return aVal < bVal ? 1 : -1
+      }
+    })
 
     return filtered
-  }, [bookings, okOverviews, filters.columnFilters])
+  }, [bookings, okOverviews, filters.columnFilters, bookingSortBy, bookingSortOrder])
 
   // Prüfe ob Filter aktiv sind
   const hasActiveFilters = useMemo(() => {
@@ -562,49 +644,52 @@ export function SmartDashboard() {
       (a, b) => new Date(a.booking_date).getTime() - new Date(b.booking_date).getTime()
     )
 
-    // Verwende das ausgewählte Jahr
-    const year = selectedBurnDownYear
-
-    // Startdatum = 1. Januar des Jahres
-    const startDate = new Date(year, 0, 1)
-    // Enddatum = 31. Dezember des Jahres
-    const endDate = new Date(year, 11, 31)
+    if (sortedBookings.length === 0) return []
 
     const dataPoints: any[] = []
     let cumulativeSpent = 0
-    let bookingIndex = 0
 
-    // Generiere monatliche Datenpunkte von Januar bis Dezember
-    for (let month = 0; month < 12; month++) {
-      const monthStart = new Date(year, month, 1)
-      const monthEnd = new Date(year, month + 1, 0) // Letzter Tag des Monats
+    // Bestimme Start- und Enddatum für Ideallinie
+    const firstDate = new Date(sortedBookings[0].booking_date)
+    const lastDate = new Date(sortedBookings[sortedBookings.length - 1].booking_date)
+    
+    // Wenn Projekt noch läuft, nutze Jahresende als Enddatum
+    const yearEnd = new Date(selectedBurnDownYear, 11, 31)
+    const projectEnd = lastDate < yearEnd ? yearEnd : lastDate
+    const projectDuration = projectEnd.getTime() - firstDate.getTime()
+    
+    // Startpunkt: Voller Budget am ersten Buchungsdatum
+    dataPoints.push({
+      date: firstDate.toISOString().split('T')[0],
+      budget: selectedOK.budget_total,
+      spent: 0,
+      available: selectedOK.budget_total,
+      remaining: selectedOK.budget_total,
+      idealRemaining: selectedOK.budget_total,
+      percentage: 0
+    })
 
-      // Verarbeite alle Buchungen in diesem Monat
-      while (bookingIndex < sortedBookings.length) {
-        const booking = sortedBookings[bookingIndex]
-        const bookingDate = new Date(booking.booking_date)
-
-        if (bookingDate <= monthEnd) {
-          cumulativeSpent += Math.abs(booking.amount)
-          bookingIndex++
-        } else {
-          break
-        }
-      }
-
-      const available = selectedOK.budget_total - cumulativeSpent
-      const idealRemaining = selectedOK.budget_total * (1 - (month + 1) / 12) // Linearer Idealverlauf
+    // Erstelle einen Datenpunkt für jede Buchung
+    sortedBookings.forEach((booking, index) => {
+      cumulativeSpent += Math.abs(booking.amount)
+      const available = Math.max(0, selectedOK.budget_total - cumulativeSpent)
+      
+      // Berechne ideale Restbudget basierend auf linearem Verlauf vom ersten bis letzten Buchungsdatum
+      const bookingDate = new Date(booking.booking_date)
+      const elapsed = bookingDate.getTime() - firstDate.getTime()
+      const progress = projectDuration > 0 ? elapsed / projectDuration : 0
+      const idealRemaining = Math.max(0, selectedOK.budget_total * (1 - progress))
 
       dataPoints.push({
-        date: monthStart.toISOString().split('T')[0],
+        date: booking.booking_date,
         budget: selectedOK.budget_total,
         spent: cumulativeSpent,
-        available: Math.max(0, available),
-        remaining: Math.max(0, available),
-        idealRemaining: Math.max(0, idealRemaining),
+        available: available,
+        remaining: available,
+        idealRemaining: idealRemaining,
         percentage: (cumulativeSpent / selectedOK.budget_total) * 100
       })
-    }
+    })
 
     return [{ ok: selectedOK, data: dataPoints }]
   }, [filteredBookings, filteredData, shouldShowBookings, selectedBurnDownYear])
@@ -660,10 +745,32 @@ export function SmartDashboard() {
     }).format(amount)
   }
 
+  const formatCurrencyCompact = (amount: number) => {
+    return new Intl.NumberFormat('de-CH', { 
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount)
+  }
+
   // PDF Export Funktion
   const handlePrintPDF = () => {
     window.print()
   }
+
+  // Berechne globale KPIs (MUSS VOR allen return statements stehen!)
+  const globalKPIs = useMemo(() => {
+    const totalBudget = filteredData.reduce((sum, ok) => sum + (ok.budget_total || 0), 0)
+    const totalSpent = filteredData.reduce((sum, ok) => sum + Math.abs(ok.spent || 0), 0)
+    const totalAvailable = filteredData.reduce((sum, ok) => sum + (ok.available || 0), 0)
+    const avgUtilization = filteredData.length > 0
+      ? filteredData.reduce((sum, ok) => {
+          const util = ok.budget_total > 0 ? (Math.abs(ok.spent) / ok.budget_total) * 100 : 0
+          return sum + util
+        }, 0) / filteredData.length
+      : 0
+
+    return { totalBudget, totalSpent, totalAvailable, avgUtilization, okCount: filteredData.length }
+  }, [filteredData])
 
   if (loading) {
     return (
@@ -691,11 +798,100 @@ export function SmartDashboard() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
+    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+
+      {/* Globale KPI-Karten */}
+      <div className="flex-shrink-0 px-4 sm:px-6 py-4 sm:py-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          {/* Gesamtbudget */}
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-blue-600">
+                <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400">Gesamtbudget</p>
+                <p className="text-sm sm:text-lg font-bold text-blue-600 dark:text-blue-400 truncate">
+                  <span className="sm:hidden">{formatCurrencyCompact(globalKPIs.totalBudget)}</span>
+                  <span className="hidden sm:inline">CHF {formatCurrencyCompact(globalKPIs.totalBudget)}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Verbraucht */}
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-orange-600">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400">Verbraucht</p>
+                <p className="text-sm sm:text-lg font-bold text-orange-600 dark:text-orange-400 truncate">
+                  <span className="sm:hidden">{formatCurrencyCompact(globalKPIs.totalSpent)}</span>
+                  <span className="hidden sm:inline">CHF {formatCurrencyCompact(globalKPIs.totalSpent)}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Verfügbar */}
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-green-600">
+                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400">Verfügbar</p>
+                <p className="text-sm sm:text-lg font-bold text-green-600 dark:text-green-400 truncate">
+                  <span className="sm:hidden">{formatCurrencyCompact(globalKPIs.totalAvailable)}</span>
+                  <span className="hidden sm:inline">CHF {formatCurrencyCompact(globalKPIs.totalAvailable)}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Durchschnittliche Auslastung */}
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-purple-600">
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400">Ø Auslastung</p>
+                <p className={`text-sm sm:text-lg font-bold ${
+                  globalKPIs.avgUtilization < 75 ? 'text-green-600 dark:text-green-400' :
+                  globalKPIs.avgUtilization < 90 ? 'text-orange-600 dark:text-orange-400' :
+                  'text-red-600 dark:text-red-400'
+                } truncate`}>
+                  {globalKPIs.avgUtilization.toFixed(1)}%
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Anzahl OKs */}
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-indigo-600">
+                <Target className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400">Anzahl OKs</p>
+                <p className="text-sm sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 truncate">
+                  {globalKPIs.okCount}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Filter-Bereich */}
-      <div className="flex-shrink-0 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
-        <div className="flex items-center justify-between">
+      <div className="flex-shrink-0 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between">
           <div className="flex items-center flex-wrap gap-2.5">
             <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
               Filter:
@@ -837,76 +1033,82 @@ export function SmartDashboard() {
           )}
             </div>
           </div>
+        </div>
+      </div>
 
       {/* Tabellen */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* OK-Übersicht Tabelle (immer sichtbar, fixe kompakte Höhe) */}
-        <div className="flex-shrink-0" style={{ height: shouldShowBookings ? '120px' : 'auto' }}>
-          <div className="h-full overflow-y-auto scrollbar-thin">
-            <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
+      <div className="flex-1 flex flex-col overflow-hidden p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto w-full space-y-6">
+          {/* OK-Übersicht Tabelle (immer sichtbar, fixe kompakte Höhe) */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'} ${shouldShowBookings ? 'max-h-32' : ''} overflow-y-auto scrollbar-thin`}>
               <table className="w-full text-sm border-collapse" id="ok-table">
-                <thead className="bg-gradient-to-b from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-850 sticky top-0 z-10 shadow-sm border-b border-gray-300 dark:border-gray-600">
+                <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 shadow-sm border-b border-gray-300 dark:border-gray-600">
                   <tr>
-                    <th className="px-0 py-0 text-center">
-                      <DateFilter
-                        selectedValues={filters.columnFilters.booking_date}
-                        onFilterChange={(values) => handleColumnFilterChange('booking_date', values)}
-                        availableDates={okOverviews
-                          .filter(ok => ok.first_booking)
-                          .map(ok => new Date(ok.first_booking!))
-                        }
-                        sortable={true}
-                        sortBy={filters.sortBy}
-                        sortOrder={filters.sortOrder}
-                        onSort={() => handleSort('first_booking')}
-                      />
-                    </th>
-                    <th className="px-0 py-0 text-center">
-                      <ColumnFilter
-                        column="title"
-                        label="Titel"
-                        options={getColumnOptions('title')}
-                        selectedValues={filters.columnFilters.title}
-                        onFilterChange={handleColumnFilterChange}
-                        type="text"
-                        placeholder="Titel..."
-                        align="center"
-                        sortable={true}
-                        sortBy={filters.sortBy}
-                        sortOrder={filters.sortOrder}
-                        onSort={handleSort}
-                      />
-                    </th>
-                    <th className="px-0 py-0 text-center">
-                      <ColumnFilter
-                        column="konto_nr"
-                        label="Konto"
-                        options={getColumnOptions('konto_nr')}
-                        selectedValues={filters.columnFilters.konto_nr}
-                        onFilterChange={handleColumnFilterChange}
-                        type="select"
-                        align="center"
-                        sortable={true}
-                        sortBy={filters.sortBy}
-                        sortOrder={filters.sortOrder}
-                        onSort={handleSort}
-                      />
-                    </th>
-                    <th className="px-0 py-0 text-center">
-                      <ColumnFilter
-                        column="ok_nr"
-                        label="OK"
-                        options={getColumnOptions('ok_nr')}
-                        selectedValues={filters.columnFilters.ok_nr}
-                        onFilterChange={handleColumnFilterChange}
-                        type="select"
-                        align="center"
-                        sortable={true}
-                        sortBy={filters.sortBy}
-                        sortOrder={filters.sortOrder}
-                        onSort={handleSort}
-                      />
-                    </th>
+                    {!isOkFiltered && (
+                      <>
+                        <th className="px-0 py-0 text-center">
+                          <DateFilter
+                            selectedValues={filters.columnFilters.booking_date}
+                            onFilterChange={(values) => handleColumnFilterChange('booking_date', values)}
+                            availableDates={okOverviews
+                              .filter(ok => ok.first_booking)
+                              .map(ok => new Date(ok.first_booking!))
+                            }
+                            sortable={true}
+                            sortBy={filters.sortBy}
+                            sortOrder={filters.sortOrder}
+                            onSort={() => handleSort('first_booking')}
+                          />
+                        </th>
+                        <th className="px-0 py-0 text-center">
+                          <ColumnFilter
+                            column="title"
+                            label="Titel"
+                            options={getColumnOptions('title')}
+                            selectedValues={filters.columnFilters.title}
+                            onFilterChange={handleColumnFilterChange}
+                            type="text"
+                            placeholder="Titel..."
+                            align="center"
+                            sortable={true}
+                            sortBy={filters.sortBy}
+                            sortOrder={filters.sortOrder}
+                            onSort={handleSort}
+                          />
+                        </th>
+                        <th className="px-0 py-0 text-center">
+                          <ColumnFilter
+                            column="konto_nr"
+                            label="Konto"
+                            options={getColumnOptions('konto_nr')}
+                            selectedValues={filters.columnFilters.konto_nr}
+                            onFilterChange={handleColumnFilterChange}
+                            type="select"
+                            align="center"
+                            sortable={true}
+                            sortBy={filters.sortBy}
+                            sortOrder={filters.sortOrder}
+                            onSort={handleSort}
+                          />
+                        </th>
+                        <th className="px-0 py-0 text-center">
+                          <ColumnFilter
+                            column="ok_nr"
+                            label="OK"
+                            options={getColumnOptions('ok_nr')}
+                            selectedValues={filters.columnFilters.ok_nr}
+                            onFilterChange={handleColumnFilterChange}
+                            type="select"
+                            align="center"
+                            sortable={true}
+                            sortBy={filters.sortBy}
+                            sortOrder={filters.sortOrder}
+                            onSort={handleSort}
+                          />
+                        </th>
+                      </>
+                    )}
                     <th 
                       className="px-4 py-3 text-center cursor-pointer group hover:bg-primary-600 transition-colors"
                       onClick={() => handleSort('budget_total')}
@@ -969,31 +1171,44 @@ export function SmartDashboard() {
                         key={ok.ok_id} 
                         className="transition-colors duration-200 border-b dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                       >
-                        <td className="px-4 py-2 text-center text-black dark:text-white">
-                          {ok.first_booking 
-                            ? new Date(ok.first_booking).toLocaleDateString('de-CH', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                              })
-                            : '-'
-                          }
-                        </td>
-                        <td className="px-4 py-2 text-left text-black dark:text-white">
-                          <div className="max-w-xs truncate" title={ok.title}>
-                            {ok.title}
-                          </div>
-                        </td>
-                        <td className="px-4 py-2 text-center cursor-pointer" onClick={() => handleColumnFilterChange('konto_nr', [ok.konto_nr])} title={`Alle OKs für Konto ${ok.konto_nr} anzeigen`}>
-                          <span className="text-primary-600 dark:text-primary-400">
-                            {ok.konto_nr}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2 text-center cursor-pointer" onClick={() => handleColumnFilterChange('ok_nr', [ok.ok_nr])} title={`${ok.ok_nr}: ${ok.title}`}>
-                          <span className="text-primary-600 dark:text-primary-400">
-                            {ok.ok_nr}
-                          </span>
-                        </td>
+                        {!isOkFiltered && (
+                          <>
+                            <td className="px-4 py-2 text-center text-black dark:text-white">
+                              {ok.first_booking 
+                                ? new Date(ok.first_booking).toLocaleDateString('de-CH', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                  })
+                                : '-'
+                              }
+                            </td>
+                            <td className="px-4 py-2 text-left text-black dark:text-white">
+                              <div className="max-w-xs truncate" title={ok.title}>
+                                {ok.title}
+                              </div>
+                            </td>
+                            <td 
+                              className="px-4 py-2 text-center cursor-pointer" 
+                              onClick={() => window.location.href = `/konto/${ok.konto_nr}`} 
+                              title={`Konto ${ok.konto_nr} Details anzeigen`}
+                            >
+                              <span className="text-primary-600 dark:text-primary-400 hover:underline">
+                                {ok.konto_nr}
+                              </span>
+                            </td>
+                            <td 
+                              className="px-4 py-2 text-center cursor-pointer" 
+                              onClick={() => window.location.href = `/ok/${ok.ok_id}`}
+                            >
+                              <Tooltip text={`${ok.ok_nr} - ${ok.title} | Konto: ${ok.account_name}`}>
+                                <span className="text-primary-600 dark:text-primary-400 hover:underline">
+                                  {ok.ok_nr}
+                                </span>
+                              </Tooltip>
+                            </td>
+                          </>
+                        )}
                         <td className="px-4 py-2 text-right text-black dark:text-white">
                           {formatCurrency(ok.budget_total)}
                         </td>
@@ -1021,37 +1236,77 @@ export function SmartDashboard() {
               </table>
             </div>
           </div>
-        </div>
 
         {/* Buchungs-Detail Tabelle (nur sichtbar wenn genau 1 OK gefiltert) */}
         {shouldShowBookings && filteredBookings.length > 0 && (
-          <div className="flex-shrink-0 max-h-[400px] overflow-y-auto scrollbar-thin">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="max-h-[400px] overflow-y-auto scrollbar-thin">
               <table className="w-full text-sm border-collapse">
-                <thead className="bg-gradient-to-b from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-850 sticky top-0 z-10 shadow-sm border-b border-gray-300 dark:border-gray-600">
+                <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 shadow-sm border-b border-gray-300 dark:border-gray-600">
                   <tr>
-                    <th className="px-0 py-0 text-center">
-                      <div className="px-4 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">
-                        Datum
+                    <th 
+                      className="px-4 py-3 text-center cursor-pointer group hover:bg-primary-600 transition-colors"
+                      onClick={() => handleBookingSort('booking_date')}
+                    >
+                      <div className="flex items-center justify-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider group-hover:text-white">
+                        <span>Datum</span>
+                        {bookingSortBy === 'booking_date' && (
+                          bookingSortOrder === 'asc' ? 
+                            <SortAsc className="h-3.5 w-3.5" /> : 
+                            <SortDesc className="h-3.5 w-3.5" />
+                        )}
                       </div>
                     </th>
-                    <th className="px-0 py-0 text-center">
-                      <div className="px-4 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">
-                        Beleg
+                    <th 
+                      className="px-4 py-3 text-center cursor-pointer group hover:bg-primary-600 transition-colors"
+                      onClick={() => handleBookingSort('beleg_nr')}
+                    >
+                      <div className="flex items-center justify-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider group-hover:text-white">
+                        <span>Beleg</span>
+                        {bookingSortBy === 'beleg_nr' && (
+                          bookingSortOrder === 'asc' ? 
+                            <SortAsc className="h-3.5 w-3.5" /> : 
+                            <SortDesc className="h-3.5 w-3.5" />
+                        )}
                       </div>
                     </th>
-                    <th className="px-0 py-0 text-center">
-                      <div className="px-4 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">
-                        Text
+                    <th 
+                      className="px-4 py-3 text-left cursor-pointer group hover:bg-primary-600 transition-colors"
+                      onClick={() => handleBookingSort('text_long')}
+                    >
+                      <div className="flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider group-hover:text-white">
+                        <span>Text</span>
+                        {bookingSortBy === 'text_long' && (
+                          bookingSortOrder === 'asc' ? 
+                            <SortAsc className="h-3.5 w-3.5" /> : 
+                            <SortDesc className="h-3.5 w-3.5" />
+                        )}
                       </div>
                     </th>
-                    <th className="px-0 py-0 text-center">
-                      <div className="px-4 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">
-                        Gegenkonto
+                    <th 
+                      className="px-4 py-3 text-center cursor-pointer group hover:bg-primary-600 transition-colors"
+                      onClick={() => handleBookingSort('gegenkonto')}
+                    >
+                      <div className="flex items-center justify-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider group-hover:text-white">
+                        <span>Gegenkonto</span>
+                        {bookingSortBy === 'gegenkonto' && (
+                          bookingSortOrder === 'asc' ? 
+                            <SortAsc className="h-3.5 w-3.5" /> : 
+                            <SortDesc className="h-3.5 w-3.5" />
+                        )}
                       </div>
                     </th>
-                    <th className="px-0 py-0 text-center">
-                      <div className="px-4 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">
-                        Betrag
+                    <th 
+                      className="px-4 py-3 text-right cursor-pointer group hover:bg-primary-600 transition-colors"
+                      onClick={() => handleBookingSort('amount')}
+                    >
+                      <div className="flex items-center justify-end gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider group-hover:text-white">
+                        <span>Betrag</span>
+                        {bookingSortBy === 'amount' && (
+                          bookingSortOrder === 'asc' ? 
+                            <SortAsc className="h-3.5 w-3.5" /> : 
+                            <SortDesc className="h-3.5 w-3.5" />
+                        )}
                       </div>
                     </th>
                   </tr>
@@ -1069,7 +1324,7 @@ export function SmartDashboard() {
                           year: 'numeric'
                         })}
                       </td>
-                      <td className="px-4 py-2 text-center text-gray-600 dark:text-gray-400 font-mono text-xs">
+                      <td className="px-4 py-2 text-center text-black dark:text-white">
                         {booking.beleg_nr}
                       </td>
                       <td className="px-4 py-2 text-left text-black dark:text-white">
@@ -1077,102 +1332,20 @@ export function SmartDashboard() {
                           {booking.text_long}
                         </div>
                       </td>
-                      <td className="px-4 py-2 text-center text-gray-600 dark:text-gray-400 font-mono text-xs">
+                      <td className="px-4 py-2 text-center text-black dark:text-white">
                         {booking.gegenkonto}
                       </td>
-                      <td className="px-4 py-2 text-right text-black dark:text-white font-semibold">
+                      <td className="px-4 py-2 text-right text-black dark:text-white">
                         {formatCurrency(booking.amount)}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-          </div>
-        )}
-
-        {/* Burn-Down Chart - Automatisch wenn genau 1 OK gefiltert ist */}
-        {canShowBurnDown && burnDownData.length > 0 && (
-          <div className="flex-shrink-0 border-t-2 border-primary-500 dark:border-primary-600 burn-down-section">
-            <div className="px-6 py-4 bg-white dark:bg-gray-800">
-              {burnDownData.map(({ ok, data }) => {
-                const budgetStatus = getBudgetStatus(ok.available, ok.budget_total)
-                return (
-                  <div key={ok.ok_id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                    <div className="grid grid-cols-[260px_1fr] gap-4">
-                      {/* Linke Spalte - Infos (feste Breite) */}
-                      <div className="flex flex-col justify-between min-w-0">
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-base font-semibold text-gray-900 dark:text-white">
-                              Burn-Down Chart
-                            </h4>
-                            {/* Jahr-Auswahl */}
-                            {availableYears.length > 1 && (
-                              <select
-                                value={selectedBurnDownYear}
-                                onChange={(e) => setSelectedBurnDownYear(Number(e.target.value))}
-                                className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                              >
-                                {availableYears.map(year => (
-                                  <option key={year} value={year}>{year}</option>
-                                ))}
-                              </select>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                            {ok.ok_nr} - {ok.title}
-                          </p>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">Gesamtbudget</span>
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                              {(ok.budget_total || 0).toLocaleString('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 0 })}
-                            </span>
-                          </div>
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">Verbraucht</span>
-                            <span className="text-sm font-semibold text-red-600 dark:text-red-400">
-                              {Math.abs(ok.spent || 0).toLocaleString('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 0 })}
-                            </span>
-                          </div>
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">Verfügbar</span>
-                            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                              {(ok.available || 0).toLocaleString('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 0 })}
-                            </span>
-                          </div>
-                          
-                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">Status</span>
-                              <span className={`text-lg font-bold ${budgetStatus.color}`}>
-                                {budgetStatus.percentage.toFixed(1)}% verfügbar
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Rechte Spalte - Chart (volle Breite) */}
-                      <div className="w-full print:w-auto print:max-h-[400px]" style={{ height: '240px' }}>
-                        <BurnDownChart 
-                          data={data} 
-                          okNumber={ok.ok_nr}
-                          title={ok.title}
-                          totalBudget={ok.budget_total || 0}
-                          currentSpent={Math.abs(ok.spent || 0)}
-                          currentAvailable={ok.available || 0}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
             </div>
           </div>
         )}
+        </div>
       </div>
 
     </div>

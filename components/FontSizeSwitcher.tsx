@@ -59,7 +59,7 @@ export function FontSizeSwitcher() {
     <div className="relative flex items-center gap-1 p-1 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl">
       {/* Glassmorphism Background Slider */}
       <div 
-        className={`absolute top-1 bottom-1 w-8 rounded-lg bg-gradient-to-r from-[#0479cc] to-[#0056b3] shadow-lg transition-all duration-300 ease-out ${
+        className={`absolute top-1 bottom-1 w-8 rounded-lg bg-[#0479cc] shadow-lg transition-all duration-300 ease-out ${
           fontSize === 'small' 
             ? 'left-1' 
             : fontSize === 'medium' 

@@ -8,18 +8,7 @@ import {
   Calendar, DollarSign, Target, AlertTriangle,
   CheckCircle, Clock, Users, Building2
 } from 'lucide-react'
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  PieChart as RechartsPieChart,
-  Pie,
-  Cell
-} from 'recharts'
+import ReactECharts from 'echarts-for-react'
 
 interface AnalyticsData {
   totalBudget: number
@@ -136,28 +125,6 @@ export function AnalyticsDashboard() {
     }).format(amount)
   }
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4">
-          <p className="font-semibold text-gray-900 dark:text-white mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center space-x-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                {entry.name}: {formatCurrency(entry.value)}
-              </span>
-            </div>
-          ))}
-        </div>
-      )
-    }
-    return null
-  }
-
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']
 
   if (loading) {
@@ -193,11 +160,11 @@ export function AnalyticsDashboard() {
       <div className="glass-card p-6">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
           <div className="flex items-center space-x-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 pulse-glow">
+            <div className="p-3 rounded-2xl bg-purple-600 pulse-glow">
               <BarChart3 className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Analytics & Insights
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
@@ -225,7 +192,7 @@ export function AnalyticsDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="glass-card p-6 float hover:scale-105 transition-all duration-300">
           <div className="flex items-center space-x-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600">
+            <div className="p-3 rounded-2xl bg-blue-600">
               <DollarSign className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -239,7 +206,7 @@ export function AnalyticsDashboard() {
 
         <div className="glass-card p-6 float hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center space-x-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600">
+            <div className="p-3 rounded-2xl bg-orange-600">
               <TrendingDown className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -253,7 +220,7 @@ export function AnalyticsDashboard() {
 
         <div className="glass-card p-6 float hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center space-x-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-green-500 to-green-600">
+            <div className="p-3 rounded-2xl bg-green-600">
               <TrendingUp className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -267,7 +234,7 @@ export function AnalyticsDashboard() {
 
         <div className="glass-card p-6 float hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.3s' }}>
           <div className="flex items-center space-x-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600">
+            <div className="p-3 rounded-2xl bg-purple-600">
               <Target className="h-8 w-8 text-white" />
             </div>
             <div>
@@ -333,79 +300,117 @@ export function AnalyticsDashboard() {
         {/* Utilization Distribution - Pie Chart */}
         <div className="glass-card p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600">
+            <div className="p-2 rounded-xl bg-indigo-600">
               <PieChart className="h-6 w-6 text-white" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Auslastungsverteilung</h3>
           </div>
           
           <div className="h-80 min-h-[320px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsPieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                <Pie
-                  data={analyticsData.utilizationDistribution}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ range, count, percent }: any) => `${range}: ${count} (${((percent as number) * 100).toFixed(0)}%)`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="count"
-                >
-                  {analyticsData.utilizationDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </RechartsPieChart>
-            </ResponsiveContainer>
+            <ReactECharts
+              option={{
+                tooltip: {
+                  trigger: 'item',
+                  formatter: '{b}: {c} ({d}%)'
+                },
+                legend: {
+                  bottom: 10,
+                  left: 'center'
+                },
+                series: [
+                  {
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                      borderRadius: 10,
+                      borderColor: '#fff',
+                      borderWidth: 2
+                    },
+                    label: {
+                      show: true,
+                      formatter: '{b}: {c}'
+                    },
+                    emphasis: {
+                      label: {
+                        show: true,
+                        fontSize: 16,
+                        fontWeight: 'bold'
+                      }
+                    },
+                    data: analyticsData.utilizationDistribution.map((item, index) => ({
+                      value: item.count,
+                      name: item.range,
+                      itemStyle: { color: COLORS[index % COLORS.length] }
+                    }))
+                  }
+                ]
+              }}
+              style={{ height: '100%', width: '100%' }}
+            />
           </div>
         </div>
 
         {/* Top Accounts - Bar Chart */}
         <div className="glass-card p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
+            <div className="p-2 rounded-xl bg-purple-600">
               <Building2 className="h-6 w-6 text-white" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Top Konten</h3>
           </div>
           
           <div className="h-80 min-h-[320px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart 
-                data={analyticsData.topAccounts}
-                margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fontSize: 10, fill: 'currentColor' }}
-                  className="text-gray-600 dark:text-gray-400"
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis 
-                  tick={{ fontSize: 10, fill: 'currentColor' }}
-                  className="text-gray-600 dark:text-gray-400"
-                  tickFormatter={(value) => {
-                    if (value >= 1000000) {
-                      return `${(value / 1000000).toFixed(1)}M`
-                    } else if (value >= 1000) {
-                      return `${(value / 1000).toFixed(0)}k`
+            <ReactECharts
+              option={{
+                tooltip: {
+                  trigger: 'axis',
+                  axisPointer: {
+                    type: 'shadow'
+                  },
+                  formatter: (params: any) => {
+                    const value = formatCurrency(params[0].value)
+                    return `${params[0].name}<br/>${params[0].marker}Verbraucht: ${value}`
+                  }
+                },
+                grid: {
+                  left: '3%',
+                  right: '4%',
+                  bottom: '15%',
+                  containLabel: true
+                },
+                xAxis: {
+                  type: 'category',
+                  data: analyticsData.topAccounts.map(a => a.name),
+                  axisLabel: {
+                    rotate: 45,
+                    fontSize: 10
+                  }
+                },
+                yAxis: {
+                  type: 'value',
+                  axisLabel: {
+                    formatter: (value: number) => {
+                      if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`
+                      if (value >= 1000) return `${(value / 1000).toFixed(0)}k`
+                      return value.toString()
                     }
-                    return value.toString()
-                  }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar 
-                  dataKey="spent" 
-                  fill="#8b5cf6"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+                  }
+                },
+                series: [
+                  {
+                    name: 'Verbraucht',
+                    type: 'bar',
+                    data: analyticsData.topAccounts.map(a => a.spent),
+                    itemStyle: {
+                      color: '#8b5cf6',
+                      borderRadius: [4, 4, 0, 0]
+                    }
+                  }
+                ]
+              }}
+              style={{ height: '100%', width: '100%' }}
+            />
           </div>
         </div>
       </div>
@@ -413,51 +418,76 @@ export function AnalyticsDashboard() {
       {/* Monthly Trend - Bar Chart */}
       <div className="glass-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-green-600">
+          <div className="p-2 rounded-xl bg-green-600">
             <BarChart3 className="h-6 w-6 text-white" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Monatlicher Trend</h3>
         </div>
         
         <div className="h-80 min-h-[320px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart 
-              data={analyticsData.monthlyTrend}
-              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
-              <XAxis 
-                dataKey="month" 
-                tick={{ fontSize: 12, fill: 'currentColor' }}
-                className="text-gray-600 dark:text-gray-400"
-              />
-              <YAxis 
-                tick={{ fontSize: 12, fill: 'currentColor' }}
-                className="text-gray-600 dark:text-gray-400"
-                tickFormatter={(value) => {
-                  if (value >= 1000000) {
-                    return `${(value / 1000000).toFixed(1)}M`
-                  } else if (value >= 1000) {
-                    return `${(value / 1000).toFixed(0)}k`
+          <ReactECharts
+            option={{
+              tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                  type: 'shadow'
+                },
+                formatter: (params: any) => {
+                  let tooltip = `<strong>${params[0].axisValue}</strong><br/>`
+                  params.forEach((param: any) => {
+                    const value = formatCurrency(param.value)
+                    tooltip += `${param.marker}${param.seriesName}: ${value}<br/>`
+                  })
+                  return tooltip
+                }
+              },
+              legend: {
+                bottom: 10,
+                data: ['Budget', 'Verbraucht']
+              },
+              grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '15%',
+                containLabel: true
+              },
+              xAxis: {
+                type: 'category',
+                data: analyticsData.monthlyTrend.map(m => m.month)
+              },
+              yAxis: {
+                type: 'value',
+                axisLabel: {
+                  formatter: (value: number) => {
+                    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`
+                    if (value >= 1000) return `${(value / 1000).toFixed(0)}k`
+                    return value.toString()
                   }
-                  return value.toString()
-                }}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar 
-                dataKey="budget" 
-                fill="#10b981"
-                radius={[4, 4, 0, 0]}
-                name="Budget"
-              />
-              <Bar 
-                dataKey="spent" 
-                fill="#ef4444"
-                radius={[4, 4, 0, 0]}
-                name="Verbraucht"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+                }
+              },
+              series: [
+                {
+                  name: 'Budget',
+                  type: 'bar',
+                  data: analyticsData.monthlyTrend.map(m => m.budget),
+                  itemStyle: {
+                    color: '#10b981',
+                    borderRadius: [4, 4, 0, 0]
+                  }
+                },
+                {
+                  name: 'Verbraucht',
+                  type: 'bar',
+                  data: analyticsData.monthlyTrend.map(m => m.spent),
+                  itemStyle: {
+                    color: '#ef4444',
+                    borderRadius: [4, 4, 0, 0]
+                  }
+                }
+              ]
+            }}
+            style={{ height: '100%', width: '100%' }}
+          />
         </div>
       </div>
     </div>

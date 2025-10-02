@@ -81,6 +81,30 @@ DeepBox → MyAbacus → [Rechnungsfreigabe]
 
 **ZVV KontoRadar** ist die kosteneffiziente Web-Alternative zum Abacus Fat Client. Das Dashboard gibt allen Mitarbeitern Budget-Transparenz bei der Rechnungsfreigabe in MyAbacus – ohne Lizenzkosten, ohne Installation, direkt im Browser.
 
+### 🆕 Neueste Updates (v0.1)
+
+#### 📊 Verbesserte Visualisierung
+- **Jahresbezogene Burn-Down Charts** - Wählen Sie das gewünschte Jahr für historische Analysen
+- **Optimierte Chart-Logik** - Grüne Linie (Ideal) perfekt linear, Rote Linie (Ist) zeigt tatsächliche Buchungen
+- **OKs Treemap in Konto-Ansicht** - Sehen Sie alle Objektkredite eines Kontos auf einen Blick
+
+#### 🎯 Verbesserte UX
+- **Smart Tooltips** - Filter zeigen aktive Auswahl beim Hover
+- **OK-Kontext Tooltips** - OK-Nummer zeigt vollständigen Titel und Kontoname
+- **Sortierbare Tabellen** - Alle Tabellen mit Klick-Sortierung und visuellen Indikatoren
+- **Standard-Sortierung** - Neueste Buchungen automatisch zuerst
+
+#### 🎨 Design-Updates
+- **Emoji Favicon** 💸 - Wiedererkennbarer Browser-Tab Icon
+- **Optimierte Meta-Tags** - Besseres Sharing auf Social Media (OG/Twitter Cards)
+- **Konsistentes Styling** - Einheitliche Tabellen und Chart-Darstellung in allen Views
+- **Entfernte Spalten** - Gegenkonto-Spalte entfernt für bessere Übersichtlichkeit
+
+#### 🔧 Technische Verbesserungen
+- **Fixed Position Dropdowns** - Filter-Dialoge werden nicht mehr abgeschnitten
+- **Responsive Tooltips** - Dynamische Positionierung je nach verfügbarem Platz
+- **Performance-Optimierung** - Effizientere Datenfilterung und Sortierung
+
 ### 🎭 User Stories & Use Cases
 
 #### 👤 Mitarbeiter bei Rechnungsfreigabe
@@ -117,16 +141,40 @@ DeepBox → MyAbacus → [Rechnungsfreigabe]
 
 ### ✨ Hauptfunktionen
 
-- **🎯 Intelligentes Dashboard** - Konsolidierte Sicht für alle Benutzergruppen
-- **📊 Analytics & Insights** - Detaillierte Auswertungen und Trends mit Burn-Down Charts
-- **📈 Burn-Down Chart** - Visualisierung des Budget-Verbrauchs über das Jahr mit Jahresauswahl
+#### 📊 Dashboard & Visualisierung
+- **🎯 Intelligentes Dashboard** - Konsolidierte Sicht für alle Benutzergruppen mit KPI-Cards
+- **📈 Burn-Down Charts** - Jahresbezogene Visualisierung des Budget-Verbrauchs
+  - Grüne Linie: Idealer linearer Verbrauch (Soll)
+  - Rote Linie: Tatsächlicher Verbrauch basierend auf Buchungen (Ist)
+  - Jahr-Selector für historische Analysen
+- **🗺️ Treemap Visualisierung** - Hierarchische Darstellung von Budgetverteilungen
+  - OK-Ansicht: Buchungen nach Größe
+  - Konto-Ansicht: Alle OKs im Überblick
+- **📊 Analytics & Insights** - Detaillierte Auswertungen und Trends
+
+#### 🔍 Filter & Suche
+- **Excel-ähnliche Spaltenfilter** - Intelligente Multi-Select Filter mit Suche
+- **📅 Datums-Filter** - Nach Jahr, Monat oder benutzerdefiniertem Bereich
+- **💡 Smart Tooltips** - Zeigt aktive Filter beim Hover an
+- **💾 Gespeicherte Ansichten** - Persönliche Filterkonfigurationen speichern
+
+#### 📋 Tabellen & Sortierung
+- **🔄 Sortierbare Spalten** - Alle Tabellen mit Klick-Sortierung
+  - Standard: Neueste Buchungen zuerst
+  - Visuelle Sortier-Indikatoren (Aufwärts/Abwärts Pfeile)
+- **💬 Kontext-Tooltips** - OK-Nummer zeigt Titel und Kontoname beim Hover
+- **📱 Responsive Tabellen** - Optimiert für alle Bildschirmgrößen
+
+#### 🎨 Design & UX
 - **📄 PDF Export** - Professioneller PDF-Export mit optimiertem Druck-Layout (A4 Landscape)
-- **🔍 Erweiterte Filterung** - Nach Datum, Budget, Status, Konto und OK
-- **💾 Gespeicherte Ansichten** - Persönliche Filterkonfigurationen
 - **📱 Responsive Design** - Optimiert für Desktop, Tablet und Mobile
 - **🌙 Dark/Light Mode** - Automatische Tageszeit-Erkennung mit Theme-Switcher
 - **🔤 Font-Size Switcher** - Anpassbare Schriftgröße für bessere Lesbarkeit
 - **🎨 ZVV Design System** - Offizielle Frutiger Schriftart mit Material Design Typografie
+- **💸 Emoji Favicon** - Wiedererkennbarer Tab-Icon
+- **📱 Social Media Ready** - Optimierte Meta-Tags für Sharing (OG/Twitter Cards)
+
+#### ⚡ Performance & Sicherheit
 - **⚡ Performance** - Optimierte Queries mit PostgreSQL Views
 - **🔒 Security** - Row Level Security (RLS) auf Datenbankebene
 - **🔗 GitHub Integration** - Direkter Link zum Open-Source Repository

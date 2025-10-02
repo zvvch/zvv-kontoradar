@@ -3,6 +3,33 @@
 import { useState, useRef, useEffect } from 'react'
 import { Calendar, ChevronDown, X, Check, Filter, SortAsc, SortDesc } from 'lucide-react'
 
+interface TooltipProps {
+  text: string
+  children: React.ReactNode
+}
+
+function Tooltip({ text, children }: TooltipProps) {
+  const [isVisible, setIsVisible] = useState(false)
+
+  return (
+    <div 
+      className="relative"
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+    >
+      {children}
+      {isVisible && (
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-[10000] pointer-events-none">
+          {text}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-px">
+            <div className="border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 interface DateFilterProps {
   selectedValues: string[]
   onFilterChange: (values: string[]) => void
@@ -16,7 +43,33 @@ interface DateFilterProps {
 export function DateFilter({ selectedValues, onFilterChange, availableDates, sortable = false, sortBy, sortOrder, onSort }: DateFilterProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'year' | 'month'>('year')
+  const [dropdownPosition, setDropdownPosition] = useState<{ top?: number; bottom?: number; left: number }>({ left: 0 })
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLDivElement>(null)
+
+  // Prüfe Position und öffne nach oben oder unten
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      const dropdownHeight = 450
+      const dropdownWidth = 320
+      const spaceBelow = window.innerHeight - rect.bottom
+      const spaceAbove = rect.top
+      
+      let left = rect.left
+      // Stelle sicher, dass das Dropdown nicht über den rechten Rand hinausgeht
+      if (left + dropdownWidth > window.innerWidth) {
+        left = window.innerWidth - dropdownWidth - 10
+      }
+      
+      // Öffne nach oben oder unten
+      if (spaceBelow < dropdownHeight && spaceAbove >= dropdownHeight) {
+        setDropdownPosition({ bottom: window.innerHeight - rect.top + 8, left })
+      } else {
+        setDropdownPosition({ top: rect.bottom + 8, left })
+      }
+    }
+  }, [isOpen])
 
   // Schließe Dropdown bei Klick außerhalb
   useEffect(() => {
@@ -89,28 +142,38 @@ export function DateFilter({ selectedValues, onFilterChange, availableDates, sor
 
   const hasActiveFilters = selectedValues.length > 0
 
+  // Erstelle Tooltip-Text für aktive Filter
+  const getTooltipText = () => {
+    if (!hasActiveFilters) return 'Datum filtern'
+    if (selectedValues.length === 1) return `Aktiver Filter: ${selectedValues[0]}`
+    return `${selectedValues.length} Filter aktiv: ${selectedValues.slice(0, 3).join(', ')}${selectedValues.length > 3 ? '...' : ''}`
+  }
+
   return (
     <div 
       ref={dropdownRef}
       className="relative flex items-center justify-center h-full"
     >
-      <div 
-        onClick={() => setIsOpen(!isOpen)}
-        className={`group cursor-pointer flex items-center space-x-2 font-semibold text-sm transition-all duration-200 px-4 py-3.5 h-full justify-center ${
-          hasActiveFilters 
-            ? 'text-primary-600' 
-            : 'text-gray-800 dark:text-gray-200'
-        } hover:bg-primary-600 hover:text-white`}
-      >
-        <span className="group-hover:text-white">Datum</span>
-        {hasActiveFilters && (
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
-            {selectedValues.length}
-          </span>
-        )}
-        <ChevronDown className={`h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-all ${isOpen ? 'rotate-180' : ''}`} />
-        <Filter className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
-      </div>
+      <Tooltip text={getTooltipText()}>
+        <div 
+          ref={buttonRef}
+          onClick={() => setIsOpen(!isOpen)}
+          className={`group cursor-pointer flex items-center space-x-2 font-semibold text-sm transition-all duration-200 px-4 py-3.5 h-full justify-center ${
+            hasActiveFilters 
+              ? 'text-primary-600' 
+              : 'text-gray-800 dark:text-gray-200'
+          } hover:bg-primary-600 hover:text-white`}
+        >
+          <span className="group-hover:text-white">Datum</span>
+          {hasActiveFilters && (
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
+              {selectedValues.length}
+            </span>
+          )}
+          <ChevronDown className={`h-3.5 w-3.5 text-gray-400 group-hover:text-white transition-all ${isOpen ? 'rotate-180' : ''}`} />
+          <Filter className="h-3.5 w-3.5 text-gray-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
+        </div>
+      </Tooltip>
       
       {/* Sort Button */}
       {sortable && onSort && (
@@ -137,7 +200,13 @@ export function DateFilter({ selectedValues, onFilterChange, availableDates, sor
       {/* Filter Dialog */}
       {isOpen && (
         <div 
-          className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]"
+          ref={dropdownRef}
+          className="fixed w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]"
+          style={{
+            top: dropdownPosition.top !== undefined ? `${dropdownPosition.top}px` : 'auto',
+            bottom: dropdownPosition.bottom !== undefined ? `${dropdownPosition.bottom}px` : 'auto',
+            left: `${dropdownPosition.left}px`
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
