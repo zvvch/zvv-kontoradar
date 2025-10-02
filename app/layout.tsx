@@ -2,13 +2,10 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme'
-import { ThemeSwitcher } from '@/components/ThemeSwitcher'
-import { FontSizeSwitcher } from '@/components/FontSizeSwitcher'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PerformanceMonitor } from '@/components/PerformanceMonitor'
 import { LogoLink } from '@/components/LogoLink'
 import { Footer } from '@/components/Footer'
-import { Github } from 'lucide-react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -58,24 +55,8 @@ export default function RootLayout({
             {/* Kompakter Header - Full Width */}
             <header className="flex-shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
               <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center py-3">
-                  <div className="flex items-center space-x-4 flex-1 sm:flex-initial justify-center sm:justify-start">
-                    <LogoLink />
-                  </div>
-                  
-                  <nav className="hidden sm:flex items-center gap-2 sm:gap-3">
-                    <a 
-                      href="https://github.com/zvvch/zvv-kontoradar" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors no-print"
-                      title="GitHub Repository"
-                    >
-                      <Github className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                    </a>
-                    <FontSizeSwitcher />
-                    <ThemeSwitcher />
-                  </nav>
+                <div className="flex justify-center items-center py-3">
+                  <LogoLink />
                 </div>
               </div>
             </header>
