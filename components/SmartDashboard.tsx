@@ -1343,8 +1343,8 @@ export function SmartDashboard() {
       </div>
     )}
 
+      </div>
     </div>
   </div>
-</div>
   )
 }
