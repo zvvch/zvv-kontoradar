@@ -1031,9 +1031,8 @@ export function SmartDashboard() {
               PDF Export
             </button>
           )}
+          </div>
         </div>
-      </div>
-    </div>
 
     {/* Tabellen */}
     {/* OK-Übersicht Tabelle (immer sichtbar, fixe kompakte Höhe) */}
@@ -1343,8 +1342,8 @@ export function SmartDashboard() {
       </div>
     )}
 
-      </div>
     </div>
   </div>
+</div>
   )
 }
