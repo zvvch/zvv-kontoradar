@@ -799,10 +799,12 @@ export function SmartDashboard() {
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+      
+      {/* Scrollbarer Content */}
+      <div className="flex-1 flex flex-col overflow-auto p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto w-full space-y-6">
 
-      {/* Globale KPI-Karten */}
-      <div className="flex-shrink-0 px-4 sm:px-6 py-4 sm:py-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto">
+          {/* Globale KPI-Karten */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {/* Gesamtbudget */}
           <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4">
@@ -886,11 +888,9 @@ export function SmartDashboard() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Filter-Bereich */}
-      <div className="flex-shrink-0 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto">
+        {/* Filter-Bereich */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between">
           <div className="flex items-center flex-wrap gap-2.5">
             <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -1034,11 +1034,8 @@ export function SmartDashboard() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Tabellen */}
-      <div className="flex-1 flex flex-col overflow-auto p-4 sm:p-6">
-        <div className="max-w-7xl mx-auto w-full space-y-6">
+        {/* Tabellen */}
           {/* OK-Übersicht Tabelle (immer sichtbar, fixe kompakte Höhe) */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
             <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'} ${shouldShowBookings ? 'max-h-32' : ''} overflow-y-auto scrollbar-thin`}>
@@ -1345,6 +1342,7 @@ export function SmartDashboard() {
             </div>
           </div>
         )}
+        
         </div>
       </div>
 
